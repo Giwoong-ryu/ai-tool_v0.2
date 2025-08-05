@@ -1,0 +1,172 @@
+[
+  {
+    "id": "workflow_001",
+    "title": "강의 영상 요약해서 멋진 발표 자료로",
+    "description": "강의 영상을 요약하고 시각적으로 매력적인 발표 자료를 만드는 워크플로우",
+    "category": "교육/발표",
+    "steps": [
+      {
+        "order": 1,
+        "tool": "릴리스AI",
+        "action": "강의 요약",
+        "description": "YouTube 강의 영상을 텍스트로 요약합니다."
+      },
+      {
+        "order": 2,
+        "tool": "Mapify",
+        "action": "생각 지도",
+        "description": "요약된 내용을 마인드맵 형태로 구조화합니다."
+      },
+      {
+        "order": 3,
+        "tool": "EdrawMind",
+        "action": "발표 그림",
+        "description": "마인드맵을 시각적인 다이어그램으로 변환합니다."
+      },
+      {
+        "order": 4,
+        "tool": "Beautiful.ai",
+        "action": "예쁘게 꾸미기",
+        "description": "최종 발표 자료를 전문적으로 디자인합니다."
+      }
+    ],
+    "estimatedTime": "30-45분",
+    "difficulty": "중급",
+    "tags": ["교육", "발표", "요약", "시각화"]
+  },
+  {
+    "id": "workflow_002",
+    "title": "해외 세미나로 투자자 설득 자료 만들기",
+    "description": "해외 세미나 내용을 분석하여 투자자 대상 피치덱을 제작하는 워크플로우",
+    "category": "비즈니스/투자",
+    "steps": [
+      {
+        "order": 1,
+        "tool": "Notta",
+        "action": "세미나 요약",
+        "description": "해외 세미나 음성을 텍스트로 변환하고 요약합니다."
+      },
+      {
+        "order": 2,
+        "tool": "Works AI",
+        "action": "보고서 틀",
+        "description": "요약된 내용을 구조화된 보고서 형태로 정리합니다."
+      },
+      {
+        "order": 3,
+        "tool": "Storytell.ai",
+        "action": "인사이트 카드",
+        "description": "핵심 인사이트를 시각적 카드 형태로 제작합니다."
+      },
+      {
+        "order": 4,
+        "tool": "Slidebean",
+        "action": "투자 덱",
+        "description": "투자자 대상 피치덱을 자동으로 생성합니다."
+      }
+    ],
+    "estimatedTime": "45-60분",
+    "difficulty": "고급",
+    "tags": ["투자", "피치덱", "세미나", "분석"]
+  },
+  {
+    "id": "workflow_003",
+    "title": "최신 통계로 멋진 보고서 만들기",
+    "description": "최신 통계 데이터를 활용하여 시각적으로 매력적인 보고서를 제작하는 워크플로우",
+    "category": "분석/보고서",
+    "steps": [
+      {
+        "order": 1,
+        "tool": "Perplexity",
+        "action": "통계 모아오기",
+        "description": "최신 통계 데이터를 검색하고 수집합니다."
+      },
+      {
+        "order": 2,
+        "tool": "Notion AI",
+        "action": "한줄 요약",
+        "description": "수집된 데이터를 핵심 포인트로 요약합니다."
+      },
+      {
+        "order": 3,
+        "tool": "Canva",
+        "action": "보고서 틀",
+        "description": "전문적인 보고서 템플릿을 생성합니다."
+      },
+      {
+        "order": 4,
+        "tool": "DALL·E 3",
+        "action": "그림 넣기",
+        "description": "보고서에 맞는 시각적 요소를 생성합니다."
+      }
+    ],
+    "estimatedTime": "25-40분",
+    "difficulty": "초급",
+    "tags": ["보고서", "통계", "시각화", "분석"]
+  },
+  {
+    "id": "workflow_004",
+    "title": "새 아이디어를 슬라이드로",
+    "description": "브레인스토밍한 아이디어를 체계적인 슬라이드로 정리하는 워크플로우",
+    "category": "기획/아이디어",
+    "steps": [
+      {
+        "order": 1,
+        "tool": "ChatGPT",
+        "action": "아이디어 정리",
+        "description": "산발적인 아이디어를 논리적으로 구조화합니다."
+      },
+      {
+        "order": 2,
+        "tool": "Monica",
+        "action": "자동 마인드맵",
+        "description": "정리된 아이디어를 마인드맵으로 시각화합니다."
+      },
+      {
+        "order": 3,
+        "tool": "EdrawMind",
+        "action": "PPT 슬라이드",
+        "description": "마인드맵을 프레젠테이션 슬라이드로 변환합니다."
+      }
+    ],
+    "estimatedTime": "20-30분",
+    "difficulty": "초급",
+    "tags": ["아이디어", "기획", "프레젠테이션", "구조화"]
+  },
+  {
+    "id": "workflow_005",
+    "title": "완벽한 자기소개서 만들기",
+    "description": "AI를 활용하여 완성도 높은 자기소개서를 작성하는 워크플로우",
+    "category": "취업/이력서",
+    "steps": [
+      {
+        "order": 1,
+        "tool": "뤼튼",
+        "action": "자소서 초안",
+        "description": "기본 정보를 바탕으로 자기소개서 초안을 작성합니다."
+      },
+      {
+        "order": 2,
+        "tool": "ChatGPT",
+        "action": "문장 다듬기",
+        "description": "초안의 문장을 자연스럽고 매력적으로 다듬습니다."
+      },
+      {
+        "order": 3,
+        "tool": "Wordvice AI",
+        "action": "맞춤법 검사",
+        "description": "문법과 맞춤법을 정확하게 교정합니다."
+      },
+      {
+        "order": 4,
+        "tool": "무하유 GPT/카피킬러",
+        "action": "AI 탐지·표절 확인",
+        "description": "AI 탐지 및 표절 여부를 확인하여 안전성을 보장합니다."
+      }
+    ],
+    "estimatedTime": "40-60분",
+    "difficulty": "중급",
+    "tags": ["자기소개서", "취업", "문서작성", "교정"]
+  }
+]
+

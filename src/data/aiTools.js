@@ -8,6 +8,8 @@ export const aiTools = [
     category: "대화",
     rating: 4.9,
     description: "범용 대화형 생성 AI의 표준. 자연스러운 언어 처리, 방대한 지식 기반, 코드/문서/상담/기획 등 다방면 활용.",
+    logo: "/images/logos/chatgpt.svg",
+    id: "chatgpt",
     strengths: [
       "대부분의 질문에 바로 답변, 전문·일상 대화 모두 자연스러움",
       "글쓰기·요약·번역·기획 등 글 생산에 강력 (마케팅, 이메일, 보고서 등)",
@@ -44,9 +46,11 @@ export const aiTools = [
   {
     id: 2,
     name: "Gemini",
+    domain: "gemini.google.com",
     category: "대화",
     rating: 4.8,
     description: "구글이 개발한 멀티모달 AI. 텍스트, 이미지, 음성 등 다양한 형태의 정보 이해 및 생성 가능. 구글 서비스와의 뛰어난 연동성.",
+    logo: "/images/logos/gemini.svg",
     strengths: [
       "멀티모달 기능: 텍스트뿐 아니라 이미지, 음성, 영상까지 이해하고 처리하는 능력 뛰어남",
       "구글 서비스 연동: Gmail, Docs, YouTube 등 구글 생태계와의 자연스러운 연동으로 생산성 향상",
@@ -81,9 +85,11 @@ export const aiTools = [
   {
     id: 3,
     name: "Claude",
+    domain: "claude.ai",
     category: "대화",
     rating: 4.7,
     description: "Anthropic이 개발한 대규모 언어 모델. 특히 긴 텍스트 처리 및 요약, 창의적 글쓰기에 강점. 윤리적 AI 개발 중점.",
+    logo: "/images/logos/claude.svg",
     strengths: [
       "긴 텍스트 처리 능력: 방대한 양의 문서나 대화 내용을 효과적으로 요약하고 이해",
       "안전하고 유해하지 않은 답변: AI 윤리를 중시하여 안전하고 책임감 있는 답변 생성",
@@ -119,6 +125,7 @@ export const aiTools = [
   {
     id: 4,
     name: "Naver Clova X",
+    domain: "clovax.naver.com",
     category: "대화",
     rating: 4.6,
     description: "네이버가 개발한 초거대 AI. 한국어 특화된 대화 및 콘텐츠 생성 능력과 네이버 서비스 연동이 강점.",
@@ -155,6 +162,7 @@ export const aiTools = [
   {
     id: 5,
     name: "Wrtn (뤼튼)",
+    domain: "wrtn.ai",
     category: "문서편집",
     rating: 4.5,
     description: "한국어에 최적화된 AI 글쓰기 플랫폼. 다양한 글쓰기 템플릿과 스타일을 지원하며, 최신 AI 모델(Claude, GPT 등) 통합으로 한국어 문맥 이해와 감각적인 글쓰기에 강점.",
@@ -194,6 +202,7 @@ export const aiTools = [
   {
     id: 6,
     name: "DeepL 번역",
+    id: "deepl",
     category: "문서편집",
     rating: 4.8,
     description: "인공지능 기반의 고품질 번역 서비스. 특히 유럽 언어 및 한국어 번역에서 자연스럽고 정확한 결과물 제공.",
@@ -230,6 +239,7 @@ export const aiTools = [
   {
     id: 7,
     name: "DeepL Write",
+    id: "deepl-write",
     category: "문서편집",
     rating: 4.7,
     description: "DeepL에서 개발한 AI 기반 글쓰기 도우미. 문법 오류 수정, 어조 변경, 문장 재구성 등 영작문 실력 향상에 도움.",
@@ -1973,6 +1983,97 @@ export const categories = [
   { id: 'AI 검색', name: 'AI 검색', icon: 'Search' },
   { id: '채용', name: '채용', icon: 'Handshake' },
   { id: '코딩/노코드', name: '코딩/노코드', icon: 'Laptop' },
+];
+
+// 총 20개의 AI 활용법 (워크플로우)
+export const aiWorkflows = [
+  // 1. 강의 영상 → 브랜드 슬라이드
+  {
+    id: 1,
+    title: "강의 영상 → 브랜드 슬라이드",
+    description: "강의 영상을 요약하고, 마인드맵으로 정리한 후, 브랜드 색상에 맞춰 발표 슬라이드를 자동 생성합니다.",
+    keywords: ["강의", "영상", "슬라이드", "PPT", "요약", "마인드맵", "발표", "디자인"],
+    steps: [
+      {
+        step_number: 1,
+        tool_name: "Vrew (브루)",
+        tool_action: "강의 요약",
+        details: "YouTube URL 붙여넣기 → '교육 영상 15분 핵심만 요약' 선택 → Generate"
+      },
+      {
+        step_number: 2,
+        tool_name: "ChatGPT",
+        tool_action: "요약 결과를 마인드맵으로 변환",
+        details: "요약 결과를 바탕으로 마인드맵 형태로 정리 요청"
+      },
+      {
+        step_number: 3,
+        tool_name: "Canva Magic Studio",
+        tool_action: "발표 슬라이드 생성",
+        details: "마인드맵 내용을 바탕으로 PPT 슬라이드 생성 및 브랜드 색상 적용"
+      }
+    ]
+  },
+  // 2. 유튜브 콘텐츠 기획 및 제작
+  {
+    id: 2,
+    title: "유튜브 콘텐츠 기획 및 제작",
+    description: "유튜브 영상 아이디어 발상부터 스크립트 작성, 썸네일 디자인까지 AI로 효율적으로 진행합니다.",
+    keywords: ["유튜브", "콘텐츠", "기획", "스크립트", "썸네일", "영상 제작"],
+    steps: [
+      {
+        step_number: 1,
+        tool_name: "ChatGPT",
+        tool_action: "아이디어 브레인스토밍",
+        details: "주제 입력 후 '유튜브 영상 아이디어 10가지 제안 및 각 아이디어별 예상 시청자 반응 분석' 요청"
+      },
+      {
+        step_number: 2,
+        tool_name: "Wrtn (뤼튼)",
+        tool_action: "영상 스크립트 초안 작성",
+        details: "선택된 아이디어를 바탕으로 '유튜브 영상 스크립트 초안 작성 (서론-본론-결론, 5분 길이)' 요청"
+      },
+      {
+        step_number: 3,
+        tool_name: "Midjourney",
+        tool_action: "썸네일 이미지 생성",
+        details: "스크립트 내용을 기반으로 '클릭률 높은 유튜브 썸네일 이미지 5가지 생성' 프롬프트 입력"
+      },
+      {
+        step_number: 4,
+        tool_name: "Canva Magic Studio",
+        tool_action: "썸네일 최종 디자인",
+        details: "생성된 썸네일 이미지 가져오기 → 텍스트 추가, 색상 보정, 로고 삽입 등 최종 디자인"
+      }
+    ]
+  },
+  // 3. SNS 마케팅 콘텐츠 자동 생성
+  {
+    id: 3,
+    title: "SNS 마케팅 콘텐츠 자동 생성",
+    description: "제품/서비스 홍보를 위한 SNS 게시물 이미지와 텍스트를 AI로 자동으로 생성합니다.",
+    keywords: ["SNS", "마케팅", "콘텐츠", "인스타그램", "페이스북", "광고", "이미지", "카피"],
+    steps: [
+      {
+        step_number: 1,
+        tool_name: "Copy.ai",
+        tool_action: "광고 카피 작성",
+        details: "제품/서비스 특징 입력 후 '인스타그램/페이스북용 200자 내외 광고 카피 3가지' 생성 요청"
+      },
+      {
+        step_number: 2,
+        tool_name: "AdCreative.ai",
+        tool_action: "고성능 광고 배너 생성",
+        details: "작성된 카피와 제품 이미지 업로드 → '전환율 높은 SNS 광고 배너 5가지' 생성 요청 → 최적화된 배너 선택"
+      },
+      {
+        step_number: 3,
+        tool_name: "Canva Magic Studio",
+        tool_action: "게시물 최종 디자인 및 예약",
+        details: "생성된 광고 배너 가져오기 → 브랜드 로고, 추가 텍스트 삽입 → SNS 채널에 맞게 크기 조정 후 예약 발행"
+      }
+    ]
+  }
 ];
 
 // aiTools 유틸리티 함수들

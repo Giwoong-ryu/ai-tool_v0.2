@@ -3,6 +3,7 @@ import { Card } from './ui/card';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { ExternalLink } from 'lucide-react';
+import AIToolIcon from './AIToolIcon';
 
 export default function AIToolCard({ tool }) {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -32,7 +33,7 @@ export default function AIToolCard({ tool }) {
       <div className="p-4">
         <div className="flex gap-4">
           {/* 왼쪽: 아이콘 */}
-          <AIToolIcon toolName={tool.name} className="w-10 h-10 flex-none" />
+          <AIToolIcon tool={tool} className="w-10 h-10 flex-none" />
 
           {/* 중앙: 제목과 설명 */}
           <div className="flex-1 min-w-0">

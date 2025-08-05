@@ -3,7 +3,7 @@ import AIToolsSearch from './AIToolsSearch';
 import AIToolCard from './AIToolCard';
 import { getToolsByCategory } from '../data/aiTools';
 
-export default function AIToolsContainer() {
+export default function AIToolsContainer({ selectedGoal, setSelectedGoal }) {
   const [tools, setTools] = useState(getToolsByCategory('all'));
 
   return (

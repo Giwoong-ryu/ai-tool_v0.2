@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run dev:*)",
+      "Bash(mkdir:*)",
+      "Bash(copy AIToolsGrid.jsx ..backup-componentsai-tools )",
+      "Bash(copy AIToolsContainer.jsx ..backup-componentsai-tools )",
+      "Bash(copy AIToolsSearch.jsx ..backup-componentsai-tools )",
+      "Bash(copy AIWorkflows.jsx ..backup-componentsworkflows )",
+      "Bash(copy ImprovedMainLanding.jsx ..backup-componentsui-components)",
+      "Bash(cp:*)",
+      "Bash(npm install:*)"
+    ],
+    "deny": []
+  }
+}

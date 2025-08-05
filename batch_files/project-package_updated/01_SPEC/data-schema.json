@@ -1,0 +1,31 @@
+{
+  "template": {
+    "id": "intro_001",
+    "category": "취업",
+    "title": "자기소개서 생성",
+    "template": "당신은 {{경력}} {{직무}}입니다. {{지원동기}}를 중심으로 자기소개서를 {{어조}}로 작성해주세요. {{선택질문}}을 반드시 한 단락에 반영해주세요. 당신은 {{페르소나}}입니다.",
+    "defaults": {
+      "경력": "신입",
+      "직무": "마케터",
+      "어조": "친근한 톤",
+      "지원동기": "브랜드 가치에 대한 공감",
+      "페르소나": "대기업의 10년차 인사과장",
+      "선택질문": "가장 성장한 경험은 무엇이었는가?"
+    }
+  },
+  "sessionState": {
+    "templateId": "intro_001",
+    "selected": {},
+    "checkedQuestions": [],
+    "finalPrompt": ""
+  },
+  "bookmark": {
+    "id": "bm_YYYYMMDD_001",
+    "title": "",
+    "templateId": "",
+    "finalPrompt": "",
+    "modelPrimary": "",
+    "tags": [],
+    "createdAt": ""
+  }
+}
