@@ -1,0 +1,65 @@
+{
+  "name": "이지픽 - AI 도구 선택 라이브러리",
+  "short_name": "이지픽",
+  "description": "ChatGPT, Claude, Midjourney 등 200+ AI 도구 중에서 최적의 선택을 도와드립니다.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2563EB",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "ko",
+  "categories": ["business", "productivity", "utilities"],
+  "icons": [
+    {
+      "src": "/favicon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/images/screenshot-desktop.webp",
+      "sizes": "1280x720",
+      "type": "image/webp",
+      "form_factor": "wide",
+      "label": "이지픽 메인 화면 (데스크톱)"
+    },
+    {
+      "src": "/images/screenshot-mobile.webp",
+      "sizes": "390x844",
+      "type": "image/webp",
+      "form_factor": "narrow",
+      "label": "이지픽 메인 화면 (모바일)"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "AI 도구 찾기",
+      "short_name": "도구 찾기",
+      "description": "원하는 AI 도구를 빠르게 찾아보세요",
+      "url": "/#search",
+      "icons": [{ "src": "/favicon.png", "sizes": "192x192" }]
+    }
+  ],
+  "prefer_related_applications": false,
+  "edge_side_panel": {
+    "preferred_width": 400
+  }
+}

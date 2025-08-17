@@ -1,12 +1,14 @@
-@import "tailwindcss";
-@import "tw-animate-css";
+/* ===== Tailwind CSS v3 호환 import ===== */
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
 
-/* 고급 폰트 시스템 */
-@import url('https://cdn.jsdelivr.net/npm/@fontsource/pretendard@5.2.5/index.min.css');
-@import url('https://cdn.jsdelivr.net/npm/suit-font@1.0.2/index.min.css');
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&display=swap');
+/* 프로페셔널 폰트 시스템 */
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/PretendardVariable.min.css');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
 
-/* 한글 폰트 최적화 */
+/* ===== 프로페셔널 폰트 최적화 ===== */
 @font-face {
   font-family: 'Pretendard Variable';
   font-weight: 45 920;
@@ -15,6 +17,41 @@
   src: url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/PretendardVariable.woff2') format('woff2-variations');
 }
 
+/* ===== Z-INDEX 체계 정리 ===== */
+:root {
+  /* Z-Index 레이어 시스템 - 개선된 버전 */
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal-backdrop: 1040;
+  --z-modal: 1050;
+  --z-popover: 1060;
+  --z-tooltip: 1070;
+  --z-notification: 1080;
+
+  /* Hero 섹션용 */
+  --bg-hero: #0C0C0C;
+  --text-main: #FFFFFF;
+  --text-accent: #7D8E82;
+  --btn-primary: #7D8E82;
+  --btn-primary-hover: #60796F;
+  --radius-btn: 0.5rem;
+
+  /* Our Story 섹션용 */
+  --bg-base: #FFFFFF;
+  --text-head: #26312C;
+  --text-accent: #60796F;
+  --text-body: rgba(38,49,44,0.8);
+  --line-vert: #60796F;
+  --card-grad: radial-gradient(120% 120% at 120% 120%, #F9FAF9 0%, #FFFFFF 60%);
+}
+
+/* ===== 모바일 안전 영역 지원 ===== */
+.safe-area-inset-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* ===== 커스텀 애니메이션 키프레임 ===== */
 @keyframes gradient-xy {
   0%, 100% {
     background-position: 0% 0%;
@@ -24,130 +61,193 @@
   }
 }
 
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+  }
+
+@keyframes glow {
+  0% {
+    box-shadow: 0 0 20px rgb(37 99 235 / 0.3);
+  }
+  100% {
+    box-shadow: 0 0 30px rgb(37 99 235 / 0.6);
+  }
+}
+
+/* ===== 애니메이션 유틸리티 클래스 ===== */
 .animate-gradient-xy {
   background-size: 400% 400%;
   animation: gradient-xy 15s ease infinite;
 }
 
-@custom-variant dark (&:is(.dark *));
-
-@theme inline {
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out;
 }
 
-:root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+.animate-scale-in {
+  animation: scaleIn 0.3s ease-out;
 }
 
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+.animate-float {
+  animation: float 6s ease-in-out infinite;
 }
 
+.animate-glow {
+  animation: glow 2s ease-in-out infinite alternate;
+}
+
+/* ===== 기본 스타일 레이어 ===== */
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
+  html {
+    scroll-behavior: smooth;
   }
+  
   body {
-    font-family: 'Pretendard Variable', 'SUIT', 'Noto Sans KR', sans-serif;
-    @apply bg-background text-foreground;
+    font-family: 'Pretendard Variable', 'Pretendard', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'sans-serif';
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* 개선된 스크롤바 스타일링 */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-gray-100;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-400;
+  }
+
+  /* 선택 텍스트 스타일링 */
+  ::selection {
+    @apply bg-blue-100 text-blue-900;
+  }
+
+  /* 포커스 링 개선 */
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-blue-500;
   }
 }
 
+/* ===== 컴포넌트 레이어 ===== */
+@layer components {
+  /* Z-Index 유틸리티 클래스 */
+  .z-dropdown { z-index: var(--z-dropdown); }
+  .z-sticky { z-index: var(--z-sticky); }
+  .z-fixed { z-index: var(--z-fixed); }
+  .z-modal-backdrop { z-index: var(--z-modal-backdrop); }
+  .z-modal { z-index: var(--z-modal); }
+  .z-popover { z-index: var(--z-popover); }
+  .z-tooltip { z-index: var(--z-tooltip); }
+  .z-toast { z-index: var(--z-toast); }
+
+  /* 프로페셔널 버튼 스타일 */
+  .btn {
+    @apply inline-flex items-center justify-center rounded-lg font-semibold transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none;
+  }
+
+  .btn-primary {
+    @apply bg-blue-500 text-white hover:bg-blue-600 hover:shadow-lg hover:scale-105;
+  }
+
+  .btn-secondary {
+    @apply text-white hover:shadow-lg hover:scale-105;
+    background: linear-gradient(135deg, #7D8E82 0%, #60796F 100%);
+  }
+
+  .btn-secondary:hover {
+    background: linear-gradient(135deg, #60796F 0%, #4A5D54 100%);
+  }
+
+  .btn-outline {
+    @apply border-2 border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white;
+  }
+
+  /* 프로페셔널 카드 스타일 */
+  .card {
+    @apply bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300;
+  }
+
+  .card-feature {
+    @apply p-8 rounded-2xl transition-all duration-300 hover:shadow-lg cursor-pointer;
+    background: var(--card-grad);
+  }
+
+  /* Glass morphism 효과 */
+  .glass {
+    @apply backdrop-blur-md rounded-lg;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .glass-dark {
+    @apply backdrop-blur-md rounded-lg;
+    background: rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  /* 텍스트 그라데이션 */
+  .text-gradient-primary {
+    background: linear-gradient(135deg, #2563EB 0%, #7D8E82 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .text-gradient-secondary {
+    background: linear-gradient(135deg, #60796F 0%, #26312C 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+/* Brand buttons — emerald 톤을 연하고 차분하게 */
+.btn-brand      { @apply inline-flex h-9 items-center rounded-lg px-3 font-medium text-white bg-emerald-600 hover:bg-emerald-700 shadow-sm; }
+
+/* 연회색 카드/표 배경 옆에서는 이걸 기본으로 사용 */
+.btn-brand-soft { @apply inline-flex h-9 items-center rounded-lg px-3 font-medium 
+                          bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100; }
+
+/* 윤곽선(ghost) — 가장 충돌이 적음 */
+.btn-brand-ghost{ @apply inline-flex h-9 items-center rounded-lg px-3 font-medium 
+                          bg-white text-emerald-700 border border-emerald-200 hover:bg-emerald-50; }
+}
+
+/* ===== 기존 도구 그리드 유지 ===== */
 .tools-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -181,3 +281,42 @@
     padding: 0 32px;
   }
 }
+/* === Brand: 다운톤 연녹색 단일 톤 (#2E7D6E) === */
+:root {
+  --brand: #2E7D6E;           /* 기본 */
+  --brand-hover: #276F62;     /* 살짝만 진하게 */
+  --brand-weak: rgba(46,125,110,.14); /* 연한 배경/보더용 동일 톤 */
+}
+
+/* 텍스트/배경/보더 유틸 */
+.text-brand { color: var(--brand); }
+.bg-brand   { background-color: var(--brand); }
+.border-brand-weak { border-color: var(--brand-weak); }
+
+/* 버튼(두 가지로 통일) */
+.btn-brand{
+  @apply inline-flex items-center justify-center h-9 px-3 rounded-lg font-medium text-white;
+  background: var(--brand);
+}
+.btn-brand:hover{ background: var(--brand-hover); }
+
+.btn-brand-ghost{
+  @apply inline-flex items-center justify-center h-9 px-3 rounded-lg font-medium bg-white;
+  color: var(--brand); border: 1px solid var(--brand-weak);
+}
+.btn-brand-ghost:hover{ background: rgba(46,125,110,.06); }
+
+/* 라벨/배지(필요할 때만) */
+.badge-brand{
+  @apply inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold;
+  color: var(--brand); background: rgba(46,125,110,.08); border: 1px solid var(--brand-weak);
+}
+
+/* === Section compact utilities === */
+.section-compact { padding-top: 2rem !important; padding-bottom: 2rem !important; }           /* ~32px */
+ @media (min-width: 768px){ .section-compact { padding-top: 2.5rem !important; padding-bottom: 2.5rem !important; } }
+ @media (min-width:1024px){ .section-compact { padding-top: 3rem !important; padding-bottom: 3rem !important; } }
+
+.grid-compact { row-gap: 1rem !important; column-gap: 1rem !important; }                       /* gap-4 정도 */
+.card-compact { padding: 1.25rem !important; }                                                 /* p-5 */
+.mt-tight    { margin-top: .5rem !important; }                                                /* mt-2 정도 */

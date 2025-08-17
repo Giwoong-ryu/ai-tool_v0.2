@@ -1,0 +1,202 @@
+트리 구조
+ C:\Users\user\Desktop\gpt\ai-tools-website\
+     2 ├───.env
+     3 ├───.env.example
+     4 ├───.env.local
+     5 ├───.gitignore
+     6 ├───[최종 로드맵].txt
+     7 ├───# 이지픽 프로페셔널 UIUX 구현 가이드 🚀_백업.txt
+     8 ├───# 이지픽 프로페셔널 UIUX 구현 가이드 🚀.txt
+     9 ├───### Clerk ### 환경변수 입력.txt
+    10 ├───각 key.txt
+    11 ├───카카오 key.png
+    12 ├───팁_맞춤설정 필요성.txt
+    13 ├───팁_역할별 협업 프롬프트 (Perplexity  Claude.txt
+    14 ├───팁_ai 툴 사이트.txt
+    15 ├───팁_hero_ui 카피(Shenkin).txt
+    16 ├───팁_Prompt Launcher UIUX 디자인 제안서.txt
+    17 ├───프로젝트 사양서 — Prompt Launcher (v1_gpt).txt
+    18 ├───apply-easypick.bat
+    19 ├───apply-step1.bat
+    20 ├───CLAUDE.md
+    21 ├───components.json
+    22 ├───database-schema.sql
+    23 ├───doctor.log
+    24 ├───EASYPICK_AUTH_PAYMENT_GUIDE.md
+    25 ├───EASYPICK_GUIDE.md
+    26 ├───easypick-setup.sh
+    27 ├───eslint.config.js
+    28 ├───fix-and-apply-step1.bat
+    29 ├───fix-tailwind.bat
+    30 ├───folder.txt
+    31 ├───folder1.txt
+    32 ├───index.html
+    33 ├───install-packages.bat
+    34 ├───jsconfig.json
+    35 ├───move-to-vscode.bat
+    36 ├───package.json
+    37 ├───PAYMENT_GUIDE.md
+    38 ├───pnpm-lock.yaml
+    39 ├───postcss.config.cjs
+    40 ├───SETUP_GUIDE.md
+    41 ├───STEP1-CHECKLIST.md
+    42 ├───tailwind.config.cjs
+    43 ├───UNIFIED_PAYMENT_GUIDE.md
+    44 ├───vercel 배포시 질문 답.md
+    45 ├───vite.config.js
+    46 ├───.claude\
+    47 │   └───settings.local.json
+    48 ├───.git\...
+    49 ├───.vercel\...
+    50 ├───.vscode\
+    51 │   ├───extensions.json
+    52 │   └───settings.json
+    53 ├───backend\
+    54 │   ├───.env
+    55 │   ├───package.json
+    56 │   └───server.js
+    57 ├───batch_files\
+    58 │   ├───1) 메인 딥리서치 프롬프트 (총괄 수집정리 지휘).txt
+    59 │   ├───20250731_203518.png
+    60 │   ├───기존 배포 삭제 후 재배포.bat
+    61 │   ├───빌드 후 미리보기.bat
+    62 │   ├───서버샐행_미리보기.bat
+    63 │   ├───자동재배포.bat
+    64 │   ├───캐시삭제_재설치.bat
+    65 │   ├───home\
+    66 │   │   └───ubuntu\
+    67 │   └───project-package_updated\
+    68 │       ├───00_OVERVIEW.md
+    69 │       ├───claude_prompt.txt
+    70 │       ├───TODO_MASTER.md
+    71 │       ├───01_SPEC\
+    72 │       ├───02_CODE\
+    73 │       ├───03_ASSETS\
+    74 │       └───백업_v.1\
+    75 ├───dist\...
+    76 ├───my-ai-app\
+    77 │   ├───.git\...
+    78 │   └───web\
+    79 │       ├───.env.local
+    80 │       ├───.gitignore
+    81 │       ├───eslint.config.mjs
+    82 │       ├───next-env.d.ts
+    83 │       ├───next.config.ts
+    84 │       ├───package.json
+    85 │       ├───pnpm-lock.yaml
+    86 │       ├───postcss.config.mjs
+    87 │       ├───README.md
+    88 │       ├───tsconfig.json
+    89 │       ├───.git\...
+    90 │       ├───.next\
+    91 │       ├───node_modules\...
+    92 │       ├───public\
+    93 │       ├───src\
+    94 │       ├───supabase\
+    95 │       └───types\
+    96 ├───node_modules\...
+    97 ├───public\
+    98 │   ├───favicon.ico
+    99 │   ├───favicon.png
+   100 │   ├───test-logo.svg
+   101 │   └───images\
+   102 │       ├───20250803_191514.png
+   103 │       ├───20250804_021124.png
+   104 │       ├───이지픽.png
+   105 │       ├───mockup.png
+   106 │       ├───mockup2.jpg
+   107 │       ├───tset.png
+   108 │       ├───ai-logos\
+   109 │       ├───Free MacBook Pro on Floor Mockup\
+   110 │       ├───logos\
+   111 │       └───Macbook Pro Mockup (Community) (복사)\
+   112 ├───src\
+   113 │   ├───App.css
+   114 │   ├───app.jsx
+   115 │   ├───index.css
+   116 │   ├───main.jsx
+   117 │   ├───tailwind.config.cjs
+   118 │   ├───api\
+   119 │   │   ├───paymentAPI.js
+   120 │   │   └───toss\
+   121 │   ├───assets\
+   122 │   │   ├───react.svg
+   123 │   │   └───ai-logos\
+   124 │   ├───backup-components\
+   125 │   │   ├───ai-tools\
+   126 │   │   ├───data\
+   127 │   │   ├───prompt-launcher\
+   128 │   │   ├───store\
+   129 │   │   ├───ui-components\
+   130 │   │   └───workflows\
+   131 │   ├───components\
+   132 │   │   ├───백업_아이콘_v1.jsx
+   133 │   │   ├───AIToolCard.jsx
+   134 │   │   ├───AIToolIcon.jsx
+   135 │   │   ├───AIToolsContainer.jsx
+   136 │   │   ├───AIToolsGrid_backup.jsx
+   137 │   │   ├───AIToolsGrid.jsx
+   138 │   │   ├───AIToolsSearch.jsx
+   139 │   │   ├───AIWorkflows.jsx
+   140 │   │   ├───ComparisonModal.jsx
+   141 │   │   ├───EasyPickHero.jsx
+   142 │   │   ├───EasyPickOurStory.jsx
+   143 │   │   ├───ImprovedMainLanding.jsx
+   144 │   │   ├───InteractiveHub.jsx
+   145 │   │   ├───InteractivePrompt.jsx
+   146 │   │   ├───MainLanding.jsx
+   147 │   │   ├───Navigation.jsx
+   148 │   │   ├───NewMainLanding_backup.jsx
+   149 │   │   ├───NewMainLanding.jsx
+   150 │   │   ├───PaymentResult.jsx
+   151 │   │   ├───PromptSuccessStory.jsx
+   152 │   │   ├───ShenkinHero.jsx
+   153 │   │   ├───UnifiedPaymentResult.jsx
+   154 │   │   └───ui\
+   155 │   ├───data\
+   156 │   │   ├───aiTools.js
+   157 │   │   └───aiUsageGuides.js
+   158 │   ├───features\
+   159 │   │   ├───auth\
+   160 │   │   ├───payment\
+   161 │   │   ├───prompt-launcher\
+   162 │   │   └───workflows\
+   163 │   ├───hooks\
+   164 │   │   ├───use-mobile.js
+   165 │   │   └───useDebounce.js
+   166 │   ├───lib\
+   167 │   │   ├───supabase.js
+   168 │   │   └───utils.js
+   169 │   ├───pages\
+   170 │   │   └───TestPromptPage.jsx
+   171 │   ├───services\
+   172 │   │   ├───aiToolsService.js
+   173 │   │   ├───authService.js
+   174 │   │   └───paymentService.js
+   175 │   └───store\
+   176 │       ├───authStore.js
+   177 │       └───promptStore.js
+   178 ├───supabase\
+   179 │   ├───config.toml
+   180 │   ├───.temp\
+   181 │   │   └───cli-latest
+   182 │   └───functions\
+   183 │       └───paypal-webhook\
+   184 └───web\
+   185     ├───.gitignore
+   186     ├───eslint.config.mjs
+   187     ├───next-env.d.ts
+   188     ├───next.config.ts
+   189     ├───package.json
+   190     ├───pnpm-lock.yaml
+   191     ├───postcss.config.mjs
+   192     ├───README.md
+   193     ├───tsconfig.json
+   194     ├───node_modules\...
+   195     ├───public\
+   196     │   ├───file.svg
+   197     │   ├───globe.svg
+   198     │   ├───next.svg
+   199     │   ├───vercel.svg
+   200     │   └───window.svg
+   201     └───src\

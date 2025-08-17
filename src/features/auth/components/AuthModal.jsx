@@ -8,32 +8,34 @@ import { Separator } from '../../../components/ui/separator.jsx'
 import { Alert, AlertDescription } from '../../../components/ui/alert.jsx'
 import { Loader2, Mail, Lock, User, Eye, EyeOff } from 'lucide-react'
 import useAuthStore from '../../../store/authStore.js'
+import { supabase } from '../../../lib/supabase.js'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import toast from 'react-hot-toast'
 
-// 폼 검증 스키마
+// 폼 검증 스키마 - 더 유연하게 수정
 const signInSchema = z.object({
-  email: z.string().email('올바른 이메일을 입력해주세요'),
-  password: z.string().min(6, '비밀번호는 최소 6자 이상이어야 합니다')
+  email: z.string().min(1, '이메일을 입력해주세요').email('올바른 이메일 형식을 입력해주세요'),
+  password: z.string().min(1, '비밀번호를 입력해주세요').min(6, '비밀번호는 최소 6자 이상이어야 합니다')
 })
 
 const signUpSchema = z.object({
-  name: z.string().min(2, '이름은 최소 2자 이상이어야 합니다'),
-  email: z.string().email('올바른 이메일을 입력해주세요'),
-  password: z.string().min(6, '비밀번호는 최소 6자 이상이어야 합니다'),
-  confirmPassword: z.string().min(6, '비밀번호 확인을 입력해주세요')
+  name: z.string().min(1, '이름을 입력해주세요').min(2, '이름은 최소 2자 이상이어야 합니다'),
+  email: z.string().min(1, '이메일을 입력해주세요').email('올바른 이메일 형식을 입력해주세요'),
+  password: z.string().min(1, '비밀번호를 입력해주세요').min(6, '비밀번호는 최소 6자 이상이어야 합니다'),
+  confirmPassword: z.string().min(1, '비밀번호 확인을 입력해주세요')
 }).refine((data) => data.password === data.confirmPassword, {
   message: "비밀번호가 일치하지 않습니다",
   path: ["confirmPassword"]
 })
 
 const resetSchema = z.object({
-  email: z.string().email('올바른 이메일을 입력해주세요')
+  email: z.string().min(1, '이메일을 입력해주세요').email('올바른 이메일 형식을 입력해주세요')
 })
 
 const AuthModal = ({ open, onOpenChange, onSuccess }) => {
-  const [mode, setMode] = useState('signin') // 'signin', 'signup', 'reset'
+  const [mode, setMode] = useState('signup') // 기본값을 signup으로 변경
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -53,18 +55,33 @@ const AuthModal = ({ open, onOpenChange, onSuccess }) => {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitted, touchedFields },
     reset: resetForm,
+    clearErrors,
     watch
   } = useForm({
-    resolver: zodResolver(getSchema())
+    resolver: zodResolver(getSchema()),
+    mode: 'onBlur', // 포커스 잃을 때만 검증
+    reValidateMode: 'onBlur', // 재검증도 포커스 잃을 때만
+    defaultValues: {
+      name: '',
+      email: '',
+      password: '',
+      confirmPassword: ''
+    }
   })
 
   // 모드 변경시 폼 리셋
   React.useEffect(() => {
-    resetForm()
+    resetForm({
+      name: '',
+      email: '',
+      password: '',
+      confirmPassword: ''
+    })
+    clearErrors()
     setMessage('')
-  }, [mode, resetForm])
+  }, [mode, resetForm, clearErrors])
 
   // 로그인 처리
   const handleSignIn = async (data) => {
@@ -75,8 +92,11 @@ const AuthModal = ({ open, onOpenChange, onSuccess }) => {
       const { error } = await signIn(data.email, data.password)
       
       if (!error) {
+        toast.success('로그인되었습니다!')
         onSuccess?.()
         onOpenChange(false)
+      } else {
+        setMessage(error.message || '로그인에 실패했습니다.')
       }
     } catch (error) {
       setMessage('로그인 중 오류가 발생했습니다.')
@@ -95,9 +115,12 @@ const AuthModal = ({ open, onOpenChange, onSuccess }) => {
       
       if (!error) {
         setMessage('회원가입이 완료되었습니다! 이메일을 확인해주세요.')
+        toast.success('회원가입 성공! 이메일을 확인해주세요.')
         setTimeout(() => {
           setMode('signin')
         }, 3000)
+      } else {
+        setMessage(error.message || '회원가입에 실패했습니다.')
       }
     } catch (error) {
       setMessage('회원가입 중 오류가 발생했습니다.')
@@ -116,12 +139,41 @@ const AuthModal = ({ open, onOpenChange, onSuccess }) => {
       
       if (!error) {
         setMessage('비밀번호 재설정 이메일을 보냈습니다. 이메일을 확인해주세요.')
+        toast.success('비밀번호 재설정 이메일을 보냈습니다.')
         setTimeout(() => {
           setMode('signin')
         }, 3000)
+      } else {
+        setMessage(error.message || '비밀번호 재설정에 실패했습니다.')
       }
     } catch (error) {
       setMessage('비밀번호 재설정 중 오류가 발생했습니다.')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // 소셜 로그인 처리
+  const handleSocialLogin = async (provider) => {
+    setIsLoading(true)
+    setMessage('')
+
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: provider,
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`
+        }
+      })
+
+      if (error) {
+        setMessage(`${provider} 로그인 중 오류가 발생했습니다.`)
+        toast.error(`${provider} 로그인에 실패했습니다.`)
+      }
+    } catch (error) {
+      console.error('Social login error:', error)
+      setMessage('소셜 로그인 중 오류가 발생했습니다.')
+      toast.error('소셜 로그인에 실패했습니다.')
     } finally {
       setIsLoading(false)
     }
@@ -156,6 +208,11 @@ const AuthModal = ({ open, onOpenChange, onSuccess }) => {
     }
   }
 
+  // 에러 표시 조건 개선
+  const shouldShowError = (fieldName) => {
+    return (touchedFields[fieldName] || isSubmitted) && errors[fieldName]
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
@@ -176,12 +233,12 @@ const AuthModal = ({ open, onOpenChange, onSuccess }) => {
                   id="name"
                   type="text"
                   placeholder="이름을 입력하세요"
-                  className="pl-10"
+                  className={`pl-10 ${shouldShowError('name') ? 'border-red-500 focus:border-red-500' : ''}`}
                   {...register('name')}
                 />
               </div>
-              {errors.name && (
-                <p className="text-sm text-red-600">{errors.name.message}</p>
+              {shouldShowError('name') && (
+                <p className="text-sm text-red-600">{errors.name?.message}</p>
               )}
             </div>
           )}
@@ -195,12 +252,12 @@ const AuthModal = ({ open, onOpenChange, onSuccess }) => {
                 id="email"
                 type="email"
                 placeholder="이메일을 입력하세요"
-                className="pl-10"
+                className={`pl-10 ${shouldShowError('email') ? 'border-red-500 focus:border-red-500' : ''}`}
                 {...register('email')}
               />
             </div>
-            {errors.email && (
-              <p className="text-sm text-red-600">{errors.email.message}</p>
+            {shouldShowError('email') && (
+              <p className="text-sm text-red-600">{errors.email?.message}</p>
             )}
           </div>
 
@@ -213,8 +270,8 @@ const AuthModal = ({ open, onOpenChange, onSuccess }) => {
                 <Input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
-                  placeholder="비밀번호를 입력하세요"
-                  className="pl-10 pr-10"
+                  placeholder="비밀번호를 입력하세요 (최소 6자)"
+                  className={`pl-10 pr-10 ${shouldShowError('password') ? 'border-red-500 focus:border-red-500' : ''}`}
                   {...register('password')}
                 />
                 <button
@@ -225,8 +282,8 @@ const AuthModal = ({ open, onOpenChange, onSuccess }) => {
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
-              {errors.password && (
-                <p className="text-sm text-red-600">{errors.password.message}</p>
+              {shouldShowError('password') && (
+                <p className="text-sm text-red-600">{errors.password?.message}</p>
               )}
             </div>
           )}
@@ -241,7 +298,7 @@ const AuthModal = ({ open, onOpenChange, onSuccess }) => {
                   id="confirmPassword"
                   type={showConfirmPassword ? 'text' : 'password'}
                   placeholder="비밀번호를 다시 입력하세요"
-                  className="pl-10 pr-10"
+                  className={`pl-10 pr-10 ${shouldShowError('confirmPassword') ? 'border-red-500 focus:border-red-500' : ''}`}
                   {...register('confirmPassword')}
                 />
                 <button
@@ -252,8 +309,8 @@ const AuthModal = ({ open, onOpenChange, onSuccess }) => {
                   {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
-              {errors.confirmPassword && (
-                <p className="text-sm text-red-600">{errors.confirmPassword.message}</p>
+              {shouldShowError('confirmPassword') && (
+                <p className="text-sm text-red-600">{errors.confirmPassword?.message}</p>
               )}
             </div>
           )}
@@ -278,6 +335,53 @@ const AuthModal = ({ open, onOpenChange, onSuccess }) => {
         </form>
 
         <Separator />
+
+        {/* 소셜 로그인 버튼들 */}
+        <div className="space-y-3">
+          <p className="text-center text-sm text-gray-500">소셜 로그인으로 간편하게</p>
+          
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full flex items-center gap-3 h-12"
+            onClick={() => handleSocialLogin('google')}
+            disabled={isLoading}
+          >
+            <svg className="w-5 h-5" viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+            </svg>
+            Google로 계속하기
+          </Button>
+          
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full flex items-center gap-3 h-12"
+            onClick={() => handleSocialLogin('kakao')}
+            disabled={isLoading}
+          >
+            <div className="w-5 h-5 bg-yellow-400 rounded flex items-center justify-center">
+              <span className="text-black text-xs font-bold">K</span>
+            </div>
+            카카오로 계속하기
+          </Button>
+          
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full flex items-center gap-3 h-12"
+            onClick={() => handleSocialLogin('naver')}
+            disabled={isLoading}
+          >
+            <div className="w-5 h-5 bg-green-500 rounded flex items-center justify-center">
+              <span className="text-white text-xs font-bold">N</span>
+            </div>
+            네이버로 계속하기
+          </Button>
+        </div>
 
         {/* 모드 전환 링크 */}
         <div className="space-y-2 text-center text-sm">

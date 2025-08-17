@@ -1,0 +1,46 @@
+{
+  "items": [
+    {
+      "id": "t1",
+      "type": "tool",
+      "title": "이미지 → 텍스트 설명",
+      "summary": "이미지를 분석해 핵심 설명과 태그를 생성",
+      "tags": ["이미지", "분석"]
+    },
+    {
+      "id": "t2",
+      "type": "tool",
+      "title": "문서 요약",
+      "summary": "긴 문서를 핵심 bullet로 요약",
+      "tags": ["요약", "문서"]
+    },
+    {
+      "id": "tpl1",
+      "type": "template",
+      "title": "블로그 글 초안",
+      "summary": "주제/톤/분량 기반 초안 프롬프트",
+      "tags": ["블로그", "초안"]
+    },
+    {
+      "id": "tpl2",
+      "type": "template",
+      "title": "PPT 목차 생성",
+      "summary": "발표 목적에 맞는 목차 자동 생성",
+      "tags": ["PPT", "목차"]
+    },
+    {
+      "id": "wf1",
+      "type": "workflow",
+      "title": "리서치 → 요약 → 게시",
+      "summary": "검색·정리·게시까지 일괄",
+      "tags": ["워크플로우"]
+    },
+    {
+      "id": "wf2",
+      "type": "workflow",
+      "title": "이미지 배치 자동화",
+      "summary": "썸네일·본문 이미지를 자동 배치",
+      "tags": ["이미지", "자동"]
+    }
+  ]
+}

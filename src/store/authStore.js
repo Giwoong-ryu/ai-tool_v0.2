@@ -29,12 +29,22 @@ const useAuthStore = create(
           if (!get().authStateListener) {
             const { data: { subscription } } = AuthService.onAuthStateChange(async (event, session) => {
               if (event === 'SIGNED_IN' && session?.user) {
-                const { user, profile } = await AuthService.getCurrentUser()
-                set({ 
-                  user, 
-                  profile, 
-                  isAuthenticated: true 
-                })
+                try {
+                  const { user, profile } = await AuthService.getCurrentUser()
+                  set({ 
+                    user, 
+                    profile, 
+                    isAuthenticated: true 
+                  })
+                } catch (error) {
+                  console.error('Get current user error:', error)
+                  // 에러가 발생해도 기본 사용자 정보는 설정
+                  set({ 
+                    user: session.user, 
+                    profile: null, 
+                    isAuthenticated: true 
+                  })
+                }
               } else if (event === 'SIGNED_OUT') {
                 set({ 
                   user: null, 
@@ -47,7 +57,7 @@ const useAuthStore = create(
             set({ authStateListener: subscription })
           }
         } catch (error) {
-          console.error('Auth initialization error:', error)
+          console.error('Get current user error:', error)
           set({ 
             user: null, 
             profile: null, 
@@ -58,82 +68,130 @@ const useAuthStore = create(
       },
 
       signUp: async (email, password, name) => {
-        const { data, error } = await AuthService.signUp(email, password, name)
-        if (!error && data.user) {
-          // 이메일 확인 대기 상태로 설정
-          set({ 
-            user: data.user, 
-            profile: null, 
-            isAuthenticated: false 
-          })
+        try {
+          const { data, error } = await AuthService.signUp(email, password, name)
+          if (!error && data.user) {
+            // 이메일 확인 대기 상태로 설정
+            set({ 
+              user: data.user, 
+              profile: null, 
+              isAuthenticated: false 
+            })
+          }
+          return { data, error }
+        } catch (error) {
+          console.error('Sign up error:', error)
+          return { data: null, error }
         }
-        return { data, error }
       },
 
       signIn: async (email, password) => {
-        const { data, error } = await AuthService.signIn(email, password)
-        if (!error && data.user) {
-          const { user, profile } = await AuthService.getCurrentUser()
-          set({ 
-            user, 
-            profile, 
-            isAuthenticated: true 
-          })
+        try {
+          const { data, error } = await AuthService.signIn(email, password)
+          if (!error && data.user) {
+            // 즉시 상태 업데이트
+            set({ 
+              user: data.user, 
+              profile: null, 
+              isAuthenticated: true 
+            })
+            
+            // 프로필 정보 가져오기
+            try {
+              const { user, profile } = await AuthService.getCurrentUser()
+              set({ 
+                user, 
+                profile, 
+                isAuthenticated: true 
+              })
+            } catch (profileError) {
+              console.error('Get profile error:', profileError)
+              // 프로필 정보가 없어도 로그인은 성공으로 처리
+            }
+          }
+          return { data, error }
+        } catch (error) {
+          console.error('Sign in error:', error)
+          return { data: null, error }
         }
-        return { data, error }
       },
 
       signOut: async () => {
-        const { error } = await AuthService.signOut()
-        if (!error) {
-          set({ 
-            user: null, 
-            profile: null, 
-            isAuthenticated: false 
-          })
+        try {
+          const { error } = await AuthService.signOut()
+          if (!error) {
+            set({ 
+              user: null, 
+              profile: null, 
+              isAuthenticated: false 
+            })
+          }
+          return { error }
+        } catch (error) {
+          console.error('Sign out error:', error)
+          return { error }
         }
-        return { error }
       },
 
       updateProfile: async (updates) => {
         const { user } = get()
         if (!user) return { data: null, error: 'Not authenticated' }
 
-        const { data, error } = await AuthService.updateProfile(user.id, updates)
-        if (!error && data) {
-          set(state => ({ 
-            profile: { ...state.profile, ...data } 
-          }))
+        try {
+          const { data, error } = await AuthService.updateProfile(user.id, updates)
+          if (!error && data) {
+            set(state => ({ 
+              profile: { ...state.profile, ...data } 
+            }))
+          }
+          return { data, error }
+        } catch (error) {
+          console.error('Update profile error:', error)
+          return { data: null, error }
         }
-        return { data, error }
       },
 
       checkUsageLimit: async () => {
         const { user } = get()
         if (!user) return false
         
-        return await AuthService.checkUsageLimit(user.id)
+        try {
+          return await AuthService.checkUsageLimit(user.id)
+        } catch (error) {
+          console.error('Check usage limit error:', error)
+          return true // 에러시 사용 제한으로 처리
+        }
       },
 
       incrementUsage: async () => {
         const { user, profile } = get()
         if (!user) return false
 
-        const result = await AuthService.incrementUsage(user.id)
-        if (result && profile) {
-          // 로컬 상태 업데이트
-          set(state => ({
-            profile: {
-              ...state.profile,
-              usage_count: state.profile.usage_count + 1
-            }
-          }))
+        try {
+          const result = await AuthService.incrementUsage(user.id)
+          if (result && profile) {
+            // 로컬 상태 업데이트
+            set(state => ({
+              profile: {
+                ...state.profile,
+                usage_count: (state.profile?.usage_count || 0) + 1
+              }
+            }))
+          }
+          return result
+        } catch (error) {
+          console.error('Increment usage error:', error)
+          return false
         }
-        return result
       },
 
       resetPassword: async (email) => {
-        return await AuthService.resetPassword(email)
+        try {
+          return await AuthService.resetPassword(email)
+        } catch (error) {
+          console.error('Reset password error:', error)
+          return { data: null, error }
+        }
       },
 
       // Cleanup

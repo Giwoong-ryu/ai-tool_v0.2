@@ -1,14 +1,279 @@
 <!doctype html>
-<html lang="en">
+<html lang="ko">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AI 도구 모음 - 최고의 AI 도구들을 한 곳에서</title>
-    <script type="module" crossorigin src="/assets/index-CILusNpS.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-B3L5cDc-.css">
+    
+    <!-- SEO 및 메타 태그 -->
+    <title>이지픽 - AI 도구 선택 라이브러리 | 맞춤형 AI 도구 추천 서비스</title>
+    <meta name="description" content="나에게 딱 맞는 AI 도구를 찾고 계신가요? ChatGPT, Claude, Midjourney 등 200+ AI 도구 중에서 최적의 선택을 도와드립니다. 무료 AI 도구 추천, 비교 분석, 사용 가이드 제공." />
+    <meta name="keywords" content="AI 도구, 인공지능, ChatGPT, Midjourney, Claude, 맞춤형 추천, AI 도구 비교, 무료 AI 도구, AI 도구 가이드, 생산성 도구, AI 서비스, 이지픽" />
+    <meta name="author" content="이지픽" />
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+    <meta name="googlebot" content="index, follow" />
+    <meta name="language" content="ko-KR" />
+    <meta name="geo.region" content="KR" />
+    <meta name="geo.country" content="South Korea" />
+    <link rel="canonical" href="https://easypick.ai/" />
+    
+    <!-- Open Graph 태그 -->
+    <meta property="og:title" content="이지픽 - AI 도구 선택 라이브러리 | 맞춤형 AI 도구 추천 서비스" />
+    <meta property="og:description" content="ChatGPT, Claude, Midjourney 등 200+ AI 도구 중에서 최적의 선택을 도와드립니다. 무료 AI 도구 추천, 비교 분석, 사용 가이드 제공." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://easypick.ai/" />
+    <meta property="og:image" content="https://easypick.ai/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="이지픽 - AI 도구 선택 라이브러리" />
+    <meta property="og:site_name" content="이지픽" />
+    <meta property="og:locale" content="ko_KR" />
+    
+    <!-- Twitter Card 태그 -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@easypick_ai" />
+    <meta name="twitter:creator" content="@easypick_ai" />
+    <meta name="twitter:title" content="이지픽 - AI 도구 선택 라이브러리 | 맞춤형 AI 도구 추천 서비스" />
+    <meta name="twitter:description" content="ChatGPT, Claude, Midjourney 등 200+ AI 도구 중에서 최적의 선택을 도와드립니다. 무료 AI 도구 추천, 비교 분석, 사용 가이드 제공." />
+    <meta name="twitter:image" content="https://easypick.ai/twitter-image.png" />
+    <meta name="twitter:image:alt" content="이지픽 - AI 도구 선택 라이브러리" />
+    
+    <!-- DNS prefetch and preconnect for performance -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Preload critical resources -->
+    <link rel="modulepreload" href="data:text/jsx;base64,Ly8gc3JjL21haW4uanN4IOKAlCBDbGVyayDsoIHsmqkg67KE7KCEIChWaXRlICsgUmVhY3QgMTgpCmltcG9ydCBSZWFjdCwgeyBTdHJpY3RNb2RlIH0gZnJvbSAncmVhY3QnOwppbXBvcnQgeyBjcmVhdGVSb290IH0gZnJvbSAncmVhY3QtZG9tL2NsaWVudCc7CmltcG9ydCAnLi9pbmRleC5jc3MnOwppbXBvcnQgQXBwIGZyb20gJy4vYXBwLmpzeCc7CmltcG9ydCB7IHJlZ2lzdGVyIGFzIHJlZ2lzdGVyU1csIHByZWNhY2hlUmVzb3VyY2VzIH0gZnJvbSAnLi91dGlscy9zZXJ2aWNlV29ya2VyLmpzJzsKaW1wb3J0IHsgQ2xlcmtQcm92aWRlciB9IGZyb20gJ0BjbGVyay9jbGVyay1yZWFjdCc7CmltcG9ydCB7IGtvS1IgfSBmcm9tICdAY2xlcmsvbG9jYWxpemF0aW9ucyc7CgovLyBXZWIgVml0YWxzIOy9mOyGlCDstpzroKUo7ISg7YOdKQppZiAodHlwZW9mIHdpbmRvdyAhPT0gJ3VuZGVmaW5lZCcpIHsKICBmdW5jdGlvbiBzZW5kVG9BbmFseXRpY3MobWV0cmljKSB7CiAgICBjb25zb2xlLmxvZygnUGVyZm9ybWFuY2UgbWV0cmljOicsIG1ldHJpYyk7CiAgfQogIGNvbnN0IHJlcG9ydFdlYlZpdGFscyA9IChvblBlcmZFbnRyeSkgPT4gewogICAgaWYgKG9uUGVyZkVudHJ5ICYmIHR5cGVvZiBvblBlcmZFbnRyeSA9PT0gJ2Z1bmN0aW9uJykgewogICAgICBpZiAoJ1BlcmZvcm1hbmNlT2JzZXJ2ZXInIGluIHdpbmRvdykgewogICAgICAgIHRyeSB7CiAgICAgICAgICBjb25zdCBsY3BPYnNlcnZlciA9IG5ldyBQZXJmb3JtYW5jZU9ic2VydmVyKChlbnRyeUxpc3QpID0+IHsKICAgICAgICAgICAgY29uc3QgZW50cmllcyA9IGVudHJ5TGlzdC5nZXRFbnRyaWVzKCk7CiAgICAgICAgICAgIGNvbnN0IGxhc3RFbnRyeSA9IGVudHJpZXNbZW50cmllcy5sZW5ndGggLSAxXTsKICAgICAgICAgICAgb25QZXJmRW50cnkoeyBuYW1lOiAnTENQJywgdmFsdWU6IGxhc3RFbnRyeS5zdGFydFRpbWUsIGlkOiAnbGFyZ2VzdC1jb250ZW50ZnVsLXBhaW50JyB9KTsKICAgICAgICAgIH0pOwogICAgICAgICAgbGNwT2JzZXJ2ZXIub2JzZXJ2ZSh7IHR5cGU6ICdsYXJnZXN0LWNvbnRlbnRmdWwtcGFpbnQnLCBidWZmZXJlZDogdHJ1ZSB9KTsKICAgICAgICB9IGNhdGNoIHt9CiAgICAgICAgdHJ5IHsKICAgICAgICAgIGNvbnN0IGZpZE9ic2VydmVyID0gbmV3IFBlcmZvcm1hbmNlT2JzZXJ2ZXIoKGVudHJ5TGlzdCkgPT4gewogICAgICAgICAgICBjb25zdCBlbnRyaWVzID0gZW50cnlMaXN0LmdldEVudHJpZXMoKTsKICAgICAgICAgICAgZW50cmllcy5mb3JFYWNoKChlbnRyeSkgPT4gewogICAgICAgICAgICAgIG9uUGVyZkVudHJ5KHsgbmFtZTogJ0ZJRCcsIHZhbHVlOiBlbnRyeS5wcm9jZXNzaW5nU3RhcnQgLSBlbnRyeS5zdGFydFRpbWUsIGlkOiAnZmlyc3QtaW5wdXQtZGVsYXknIH0pOwogICAgICAgICAgICB9KTsKICAgICAgICAgIH0pOwogICAgICAgICAgZmlkT2JzZXJ2ZXIub2JzZXJ2ZSh7IHR5cGU6ICdmaXJzdC1pbnB1dCcsIGJ1ZmZlcmVkOiB0cnVlIH0pOwogICAgICAgIH0gY2F0Y2gge30KICAgICAgICB0cnkgewogICAgICAgICAgY29uc3QgY2xzT2JzZXJ2ZXIgPSBuZXcgUGVyZm9ybWFuY2VPYnNlcnZlcigoZW50cnlMaXN0KSA9PiB7CiAgICAgICAgICAgIGxldCBjbHNWYWx1ZSA9IDA7CiAgICAgICAgICAgIGNvbnN0IGVudHJpZXMgPSBlbnRyeUxpc3QuZ2V0RW50cmllcygpOwogICAgICAgICAgICBlbnRyaWVzLmZvckVhY2goKGVudHJ5KSA9PiB7IGlmICghZW50cnkuaGFkUmVjZW50SW5wdXQpIGNsc1ZhbHVlICs9IGVudHJ5LnZhbHVlOyB9KTsKICAgICAgICAgICAgb25QZXJmRW50cnkoeyBuYW1lOiAnQ0xTJywgdmFsdWU6IGNsc1ZhbHVlLCBpZDogJ2N1bXVsYXRpdmUtbGF5b3V0LXNoaWZ0JyB9KTsKICAgICAgICAgIH0pOwogICAgICAgICAgY2xzT2JzZXJ2ZXIub2JzZXJ2ZSh7IHR5cGU6ICdsYXlvdXQtc2hpZnQnLCBidWZmZXJlZDogdHJ1ZSB9KTsKICAgICAgICB9IGNhdGNoIHt9ICAgICAgfQogICAgfQogIH07CiAgcmVwb3J0V2ViVml0YWxzKHNlbmRUb0FuYWx5dGljcyk7Cn0KCi8vIENsZXJrIFB1Ymxpc2hhYmxlIEtleSAoVml0ZSkKY29uc3QgUFVCTElTSEFCTEVfS0VZID0gaW1wb3J0Lm1ldGEuZW52LlZJVEVfQ0xFUktfUFVCTElTSEFCTEVfS0VZOwoKLy8g66Oo7Yq4IOugjOuNlApjb25zdCBjb250YWluZXIgPSBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgncm9vdCcpOwpjb25zdCByb290ID0gY3JlYXRlUm9vdChjb250YWluZXIpOwoKLy8g7YKk6rCAIOyXhuycvOuptCBDbGVyayDsl4bsnbQg66CM642UKOqwnOuwnCDtjrjsnZgpCmlmICghUFVCTElTSEFCTEVfS0VZKSB7CiAgY29uc29sZS53YXJuKCdWSVRFX0NMRVJLX1BVQkxJU0hBQkxFX0tFWeqwgCDsl4bsirXri4jri6QuIENsZXJrIOyXhuydtCDslbHsnYQg66CM642U66eB7ZWp64uI64ukLicpOwogIHJvb3QucmVuZGVyKAogICAgPFN0cmljdE1vZGU+CiAgICAgIDxBcHAgLz4KICAgIDwvU3RyaWN0TW9kZT4KICApOwp9IGVsc2UgewogIHJvb3QucmVuZGVyKAogICAgPFN0cmljdE1vZGU+CiAgICAgIDxDbGVya1Byb3ZpZGVyIHB1Ymxpc2hhYmxlS2V5PXtQVUJMSVNIQUJMRV9LRVl9IGxvY2FsaXphdGlvbj17a29LUn0+CiAgICAgICAgPEFwcCAvPgogICAgICA8L0NsZXJrUHJvdmlkZXI+CiAgICA8L1N0cmljdE1vZGU+CiAgKTsKfQoKLy8gU2VydmljZSBXb3JrZXIKcmVnaXN0ZXJTVyh7CiAgb25TdWNjZXNzOiAoKSA9PiB7CiAgICBjb25zb2xlLmxvZygnU2VydmljZSBXb3JrZXIgcmVnaXN0ZXJlZCBzdWNjZXNzZnVsbHknKTsKICAgIHByZWNhY2hlUmVzb3VyY2VzKFsnL2Zhdmljb24ucG5nJywgJy9tYW5pZmVzdC5qc29uJ10pOwogIH0sCiAgb25VcGRhdGU6ICgpID0+IHsKICAgIGNvbnNvbGUubG9nKCdOZXcgc2VydmljZSB3b3JrZXIgYXZhaWxhYmxlJyk7CiAgfSwKfSk7CgovLyDtlbXsi6wg7Y+w7Yq4IO2UhOumrOuhnOuTnCjshKDtg50pCmlmICh0eXBlb2Ygd2luZG93ICE9PSAndW5kZWZpbmVkJykgewogIGNvbnN0IGZvbnRMaW5rID0gZG9jdW1lbnQuY3JlYXRlRWxlbWVudCgnbGluaycpOwogIGZvbnRMaW5rLnJlbCA9ICdwcmVsb2FkJzsKICBmb250TGluay5ocmVmID0gJ2h0dHBzOi8vY2RuLmpzZGVsaXZyLm5ldC9naC9vcmlvbmNhY3R1cy9wcmV0ZW5kYXJkL2Rpc3Qvd2ViL3ZhcmlhYmxlL1ByZXRlbmRhcmRWYXJpYWJsZS53b2ZmMic7CiAgZm9udExpbmsuYXMgPSAnZm9udCc7CiAgZm9udExpbmsudHlwZSA9ICdmb250L3dvZmYyJzsKICBmb250TGluay5jcm9zc09yaWdpbiA9ICdhbm9ueW1vdXMnOwogIGRvY3VtZW50LmhlYWQuYXBwZW5kQ2hpbGQoZm9udExpbmspOwp9">
+    <link rel="modulepreload" href="/assets/app-g7M6ao7C.jsx">
+    
+    <!-- Preload critical images -->
+    <link rel="preload" as="image" href="/favicon.png" type="image/png">
+    
+    <!-- Early resource hints -->
+    <link rel="dns-prefetch" href="https://api.supabase.co">
+    <link rel="dns-prefetch" href="https://fonts.bunny.net">
+    
+    <!-- 폰트 preload for performance - Critical fonts first -->
+    <link rel="preload" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/PretendardVariable.woff2" as="font" type="font/woff2" crossorigin>
+    
+    <!-- Critical CSS and font loading optimization -->
+    <style>
+      @font-face {
+        font-family: 'Pretendard Variable';
+        font-weight: 45 920;
+        font-style: normal;
+        font-display: swap;
+        src: url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/PretendardVariable.woff2') format('woff2-variations');
+      }
+      
+      /* Critical above-the-fold styles */
+      html, body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Pretendard Variable', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+        font-size-adjust: 0.5;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        background-color: #fafafa;
+        color: #111827;
+      }
+      
+      /* Critical layout styles - prevent CLS */
+      #root {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      
+      /* Loading skeleton to prevent layout shift */
+      .loading-skeleton {
+        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        background-size: 200% 100%;
+        animation: skeleton-loading 1.5s infinite;
+      }
+      
+      @keyframes skeleton-loading {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+      }
+      
+      /* Critical header styles */
+      .hero-section {
+        padding: 3rem 1rem;
+        text-align: center;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+      }
+      
+      .hero-title {
+        font-size: clamp(2rem, 4vw, 3.5rem);
+        font-weight: 700;
+        line-height: 1.1;
+        margin: 0 0 1rem 0;
+      }
+      
+      .hero-subtitle {
+        font-size: clamp(1rem, 2vw, 1.25rem);
+        opacity: 0.9;
+        margin: 0 0 2rem 0;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      
+      /* Grid layout optimization */
+      .tools-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+        padding: 2rem 1rem;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      
+      /* Card styles to prevent layout shift */
+      .tool-card {
+        background: white;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        height: -moz-fit-content;
+        height: fit-content;
+        min-height: 200px;
+      }
+      
+      .tool-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+      
+      /* Performance optimizations */
+      img {
+        max-width: 100%;
+        height: auto;
+        loading: lazy;
+        decoding: async;
+      }
+      
+      /* Reduce paint complexity */
+      * {
+        box-sizing: border-box;
+      }
+      
+      /* GPU acceleration for transforms */
+      .tool-card, .loading-skeleton {
+        will-change: transform;
+        transform: translateZ(0);
+      }
+    </style>
+    
+    <!-- 테마 컨러 -->
+    <meta name="theme-color" content="#2563EB" />
+    <meta name="msapplication-TileColor" content="#2563EB" />
+    
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+    
+    <!-- Apple touch icons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    
+    <!-- Security headers -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; worker-src blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; font-src 'self' https: data:; connect-src 'self' https:; frame-src 'self' https:;" />
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+    <meta http-equiv="X-Frame-Options" content="DENY" />
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
+    
+    <!-- JSON-LD structured data for SEO -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "이지픽 - AI 도구 선택 라이브러리",
+      "description": "ChatGPT, Claude, Midjourney 등 200+ AI 도구 중에서 최적의 선택을 도와드립니다.",
+      "url": "https://easypick.ai",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "KRW"
+      },
+      "author": {
+        "@type": "Organization",
+        "name": "이지픽"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "이지픽",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://easypick.ai/favicon.png"
+        }
+      }
+    }
+    </script>
+    <script type="module" crossorigin src="/assets/index-CsVuzbQA.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/react-vendor-DHbHB7JU.js">
+    <link rel="modulepreload" crossorigin href="/assets/radix-core-Dr_t8bML.js">
+    <link rel="modulepreload" crossorigin href="/assets/services-DyVQbO7m.js">
+    <link rel="modulepreload" crossorigin href="/assets/routing-state-OoBjRc81.js">
+    <link rel="modulepreload" crossorigin href="/assets/radix-extended-2duK1gdH.js">
+    <link rel="modulepreload" crossorigin href="/assets/utils-52VqQrbv.js">
+    <link rel="modulepreload" crossorigin href="/assets/icons-animations-DmL7wN_q.js">
+    <link rel="stylesheet" crossorigin href="/assets/index-DHoUrlH4.css">
   </head>
   <body>
-    <div id="root"></div>
+    <!-- Initial loading screen to prevent flash -->
+    <div id="root">
+      <div class="hero-section">
+        <div class="loading-skeleton" style="width: 300px; height: 60px; margin: 0 auto 20px;"></div>
+        <div class="loading-skeleton" style="width: 500px; height: 20px; margin: 0 auto;"></div>
+      </div>
+    </div>
+    
+    <!-- Non-blocking performance monitoring -->
+    <script>
+      // Performance observer for monitoring LCP, FID, CLS
+      if ('PerformanceObserver' in window) {
+        const observer = new PerformanceObserver((list) => {
+          for (const entry of list.getEntries()) {
+            if (entry.entryType === 'largest-contentful-paint') {
+              console.log('LCP:', entry.startTime);
+            }
+            if (entry.entryType === 'first-input') {
+              console.log('FID:', entry.processingStart - entry.startTime);
+            }
+            if (entry.entryType === 'layout-shift' && !entry.hadRecentInput) {
+              console.log('CLS:', entry.value);
+            }
+          }
+        });
+        
+        try {
+          observer.observe({type: 'largest-contentful-paint', buffered: true});
+          observer.observe({type: 'first-input', buffered: true});
+          observer.observe({type: 'layout-shift', buffered: true});
+        } catch (e) {
+          // Fallback for browsers that don't support all entry types
+          console.log('Performance observer not fully supported');
+        }
+      }
+      
+      // Critical resource loading optimization
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then(reg => console.log('SW registered'))
+            .catch(err => console.log('SW registration failed'));
+        });
+      }
+    </script>
+    
   </body>
 </html>

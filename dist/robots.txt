@@ -1,0 +1,32 @@
+User-agent: *
+Allow: /
+
+# Allow crawling of main pages
+Allow: /tools
+Allow: /prompts
+Allow: /workflows
+
+# Disallow admin and API routes
+Disallow: /api/
+Disallow: /admin/
+Disallow: /payment/
+Disallow: /test-prompt
+
+# Optimize crawl delay
+Crawl-delay: 1
+
+# Sitemap location
+Sitemap: https://easypick.ai/sitemap.xml
+
+# SEO optimizations for major search engines
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+User-agent: NaverBot
+Allow: /
+Crawl-delay: 1

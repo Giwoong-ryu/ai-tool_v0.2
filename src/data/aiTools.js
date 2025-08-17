@@ -9,7 +9,7 @@ export const aiTools = [
     rating: 4.9,
     description: "범용 대화형 생성 AI의 표준. 자연스러운 언어 처리, 방대한 지식 기반, 코드/문서/상담/기획 등 다방면 활용.",
     logo: "/images/logos/chatgpt.svg",
-    id: "chatgpt",
+    slug: "chatgpt",
     strengths: [
       "대부분의 질문에 바로 답변, 전문·일상 대화 모두 자연스러움",
       "글쓰기·요약·번역·기획 등 글 생산에 강력 (마케팅, 이메일, 보고서 등)",
@@ -202,7 +202,7 @@ export const aiTools = [
   {
     id: 6,
     name: "DeepL 번역",
-    id: "deepl",
+    slug: "deepl",
     category: "문서편집",
     rating: 4.8,
     description: "인공지능 기반의 고품질 번역 서비스. 특히 유럽 언어 및 한국어 번역에서 자연스럽고 정확한 결과물 제공.",
@@ -239,7 +239,7 @@ export const aiTools = [
   {
     id: 7,
     name: "DeepL Write",
-    id: "deepl-write",
+    slug: "deepl-write",
     category: "문서편집",
     rating: 4.7,
     description: "DeepL에서 개발한 AI 기반 글쓰기 도우미. 문법 오류 수정, 어조 변경, 문장 재구성 등 영작문 실력 향상에 도움.",
@@ -416,7 +416,7 @@ export const aiTools = [
     competitiveAdvantage: [
       { vs: "무하유 (카피킬러)", advantage: "AI가 생성한 텍스트를 탐지하는 데 특화되어 있어, 표절과 AI 생성 여부를 동시에 검증할 때 시너지가 좋습니다." }
     ],
-    icon: "CheckShield"
+    icon: "Shield"
   },
   // 12. Karlo
   {
@@ -795,7 +795,7 @@ export const aiTools = [
       { vs: "CapCut", advantage: "한국어 특화 및 텍스트 편집: CapCut보다 한국어 음성 인식 정확도가 높으며, 텍스트 기반 편집 기능이 더 강력하여 한국어 콘텐츠 제작에 매우 유리." },
       { vs: "Descript", advantage: "한국어 최적화 및 접근성: Descript가 영어권에 더 강하다면, Vrew는 한국어에 특화되어 있고 국내 사용자가 접근하기 더 쉬운 인터페이스와 가격 정책을 제공." }
     ],
-    icon: "VideoIcon"
+    icon: "Video"
   },
   // 22. Pictory AI
   {
@@ -834,7 +834,7 @@ export const aiTools = [
       { vs: "RunwayML", advantage: "텍스트 기반 자동화: RunwayML이 생성형 영상에 집중한다면, Pictory AI는 특히 '텍스트나 블로그 게시물'을 기반으로 영상을 자동으로 생성하는 데 특화되어 콘텐츠 마케터에게 유리." },
       { vs: "HeyGen", advantage: "다양한 영상 스타일: HeyGen이 아바타 기반 영상에 집중한다면, Pictory AI는 스톡 영상과 이미지 기반의 다양한 스타일 영상을 텍스트로 쉽게 생성." }
     ],
-    icon: "VideoText"
+    icon: "Video"
   },
   // 23. Otter.ai
   {
@@ -1192,7 +1192,7 @@ export const aiTools = [
     competitiveAdvantage: [
       { vs: "HeyGen/Synthesia", advantage: "사진 기반 영상 생성: HeyGen이나 Synthesia가 주로 3D 아바타나 스톡 아바타를 활용한다면, D-ID는 '한 장의 사진'만으로도 인물이 말하는 영상을 생성하여 기존 이미지를 활용하는 데 용이." }
     ],
-    icon: "UserVideo"
+    icon: "Video"
   },
   // 32. Kasa (AI 기능)
   {
@@ -1335,7 +1335,7 @@ export const aiUsageGuides = [
       {
         step_number: 2,
         tool_name: "Mapify",
-        tool_icon: "GanttChart", // Mapify 아이콘
+        tool_icon: "GitBranch", // Mapify 아이콘
         tool_action: "요약 결과를 마인드맵으로 변환",
         details: "요약 결과 오른쪽 ‘Copy text’ → Mapify → New Map > Paste text → 생성 후 Export PNG 저장"
       },
@@ -1349,7 +1349,7 @@ export const aiUsageGuides = [
       {
         step_number: 4,
         tool_name: "Beautiful.ai",
-        tool_icon: "LayoutDashboard", // Beautiful.ai 아이콘
+        tool_icon: "Monitor", // Beautiful.ai 아이콘
         tool_action: "PPT 디자인 및 브랜드 색상 적용",
         details: "Upload PPT → 좌측 Themes > 내 브랜드 색 선택"
       }
@@ -1432,21 +1432,21 @@ export const aiUsageGuides = [
       {
         step_number: 1,
         tool_name: "ChatGPT/Gemini (Advanced)",
-        tool_icon: "SquareFunction", // 데이터 분석 관련 아이콘 (또는 MessageSquare)
+        tool_icon: "Calculator", // 데이터 분석 관련 아이콘 (또는 MessageSquare)
         tool_action: "데이터 분석 및 핵심 요약",
         details: "엑셀/CSV 데이터 업로드 (유료 모델 필요) → '데이터 분석 후 핵심적인 인사이트 5가지와 수치 요약' 요청"
       },
       {
         step_number: 2,
         tool_name: "Notion AI/Microsoft Copilot (Word)",
-        tool_icon: "Microsoft", // Microsoft Copilot 아이콘
+        tool_icon: "Briefcase", // Microsoft Copilot 아이콘
         tool_action: "보고서 초안 작성",
         details: "요약된 인사이트를 바탕으로 '주간/월간 비즈니스 보고서 초안 작성 (서론-분석결과-결론-제언 포함)' 요청"
       },
       {
         step_number: 3,
         tool_name: "Beautiful.ai/Gamma/Tome",
-        tool_icon: "LayoutDashboard", // 프레젠테이션 관련 아이콘
+        tool_icon: "Monitor", // 프레젠테이션 관련 아이콘
         tool_action: "프레젠테이션 슬라이드 생성",
         details: "보고서 초안을 복사하여 붙여넣기 → '주요 내용을 요약한 10장 이내의 발표 슬라이드 자동 생성 (브랜드 색상 적용)' 요청"
       }
@@ -1483,7 +1483,7 @@ export const aiUsageGuides = [
       {
         step_number: 4,
         tool_name: "Notion AI/Microsoft Copilot",
-        tool_icon: "NotebookText", // 문서/생산성 아이콘
+        tool_icon: "BookOpen", // 문서/생산성 아이콘
         tool_action: "정리된 회의록 문서화",
         details: "요약된 내용을 Notion 페이지/Word 문서에 붙여넣기 → '깔끔한 회의록 형식으로 정리 및 주요 결정 사항 하이라이트' 요청"
       }
@@ -1520,7 +1520,7 @@ export const aiUsageGuides = [
       {
         step_number: 4,
         tool_name: "Canva Magic Studio",
-        tool_icon: "Sparkle", // 디자인 관련 아이콘
+        tool_icon: "Sparkles", // 디자인 관련 아이콘
         tool_action: "개인 브랜딩 시각 자료 디자인",
         details: "생성된 이미지와 영상 활용 → '명함, 포트폴리오 웹사이트 배너, SNS 커버 이미지 등' 개인 브랜딩 시각 자료 디자인"
       }
@@ -1587,7 +1587,7 @@ export const aiUsageGuides = [
       {
         step_number: 3,
         tool_name: "GrammarlyGo",
-        tool_icon: "SpellCheck", // 교정/편집 아이콘
+        tool_icon: "PenTool", // 교정/편집 아이콘
         tool_action: "콘텐츠 교정 및 개선",
         details: "작성된 콘텐츠를 복사하여 붙여넣기 → '문법, 맞춤법 오류 수정 및 가독성, 명확성 개선 제안 적용'"
       },
@@ -1677,7 +1677,7 @@ export const aiUsageGuides = [
       {
         step_number: 2,
         tool_name: "Mapify",
-        tool_icon: "GanttChart", // Mapify 아이콘
+        tool_icon: "GitBranch", // Mapify 아이콘
         tool_action: "요약 결과를 마인드맵으로 변환",
         details: "Lilys AI 요약 결과 오른쪽 'Copy text' 클릭 → Mapify 접속 → 'New Map > Paste text' 선택 → '생성' 후 PNG 이미지로 저장"
       },
@@ -1691,7 +1691,7 @@ export const aiUsageGuides = [
       {
         step_number: 4,
         tool_name: "Beautiful.ai",
-        tool_icon: "LayoutDashboard", // Beautiful.ai 아이콘
+        tool_icon: "Monitor", // Beautiful.ai 아이콘
         tool_action: "PPT 디자인 및 브랜드 색상 적용",
         details: "Beautiful.ai 접속 → 'Upload PPT' 선택하여 생성된 PPT 파일 업로드 → 좌측 Themes 탭에서 '내 브랜드 색상' 선택하여 디자인 적용"
       }
@@ -1714,7 +1714,7 @@ export const aiUsageGuides = [
       {
         step_number: 2,
         tool_name: "Gamma",
-        tool_icon: "LayoutDashboard", // Gamma 아이콘
+        tool_icon: "Monitor", // Gamma 아이콘
         tool_action: "요약 내용을 기반으로 PPT 생성",
         details: "Gamma 접속 → '새 프레젠테이션' 생성 → 요약된 내용 붙여넣기 → '자동 슬라이드 생성' 기능 활용하여 PPT 초안 제작 및 디자인"
       }
@@ -1767,7 +1767,7 @@ export const aiUsageGuides = [
       {
         step_number: 3,
         tool_name: "무하유 (GPT킬러)",
-        tool_icon: "CheckShield", // GPT킬러 아이콘
+        tool_icon: "Shield", // GPT킬러 아이콘
         tool_action: "AI 생성 여부 검토",
         details: "수정된 자소서 내용 복사 → GPT킬러에 붙여넣기 → 'AI 생성 여부 판별' 실행 → AI가 작성한 것으로 의심되는 부분 확인 및 자연스럽게 수정"
       }
@@ -1797,7 +1797,7 @@ export const aiUsageGuides = [
       {
         step_number: 3,
         tool_name: "GrammarlyGo",
-        tool_icon: "SpellCheck", // GrammarlyGo 아이콘
+        tool_icon: "PenTool", // GrammarlyGo 아이콘
         tool_action: "영문 이메일 최종 교정",
         details: "작성된 영문 이메일 복사 → GrammarlyGo에 붙여넣기 → '문법, 철자, 어조' 등 최종 교정 및 개선 제안 적용"
       }
@@ -1813,7 +1813,7 @@ export const aiUsageGuides = [
       {
         step_number: 1,
         tool_name: "Gamma",
-        tool_icon: "LayoutDashboard", // Gamma 아이콘
+        tool_icon: "Monitor", // Gamma 아이콘
         tool_action: "강의 내용 기반 슬라이드 초안 생성",
         details: "Gamma 접속 → '새 프레젠테이션' 생성 → 강의 주제 및 핵심 내용 입력 → '자동 슬라이드 생성' 요청"
       },
@@ -1843,7 +1843,7 @@ export const aiUsageGuides = [
       {
         step_number: 1,
         tool_name: "Mapify",
-        tool_icon: "GanttChart", // Mapify 아이콘
+        tool_icon: "GitBranch", // Mapify 아이콘
         tool_action: "텍스트를 마인드맵으로 자동 변환",
         details: "Mapify 접속 → 'New Map > Paste text' 선택 → 아이디어 텍스트 붙여넣기 → '마인드맵 자동 생성'"
       },

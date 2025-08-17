@@ -2,110 +2,133 @@
 import { supabase } from '../lib/supabase.js'
 import { ACTIVITY_TYPES } from '../lib/supabase.js'
 
-export class AIToolsService {
-  // AI 도구 검색
-  static async searchTools(query = '', filters = {}, options = {}) {
-    try {
-      let queryBuilder = supabase
-        .from('ai_tools')
-        .select('*')
+// === [ADD] 간단 동의어 사전 & 질의 확장 ===
+const SYN = {
+  '보고서': ['문서', '문서 작성', '리포트', '레포트', '보고', '문서화'],
+  '문서': ['보고서', '리포트', '문서 작성'],
+  '이미지': ['그림', '사진', '디자인'],
+  '영상': ['동영상', '비디오', '편집'],
+  '발표': ['프레젠테이션', 'PPT', '슬라이드'],
+  '코딩': ['개발', '프로그래밍', '코드'],
+  '채용': ['고용', '인사', '이력서'],
+  '검색': ['서치', '찾기']
+  // 필요 시 계속 보강
+};
 
-      // 텍스트 검색 (PostgreSQL Full Text Search 사용)
-      if (query.trim()) {
-        queryBuilder = queryBuilder.textSearch('search_vector', query.trim(), {
-          type: 'websearch',
-          config: 'korean'
-        })
-      }
-
-      // 카테고리 필터
-      if (filters.category && filters.category !== 'all') {
-        queryBuilder = queryBuilder.eq('category', filters.category)
-      }
-
-      // 서브카테고리 필터
-      if (filters.subcategory) {
-        queryBuilder = queryBuilder.eq('subcategory', filters.subcategory)
-      }
-
-      // 가격 유형 필터
-      if (filters.pricing && filters.pricing.length > 0) {
-        queryBuilder = queryBuilder.in('pricing_type', filters.pricing)
-      }
-
-      // 평점 필터
-      if (filters.minRating && filters.minRating > 0) {
-        queryBuilder = queryBuilder.gte('rating', filters.minRating)
-      }
-
-      // 인증된 도구만
-      if (filters.verifiedOnly) {
-        queryBuilder = queryBuilder.eq('is_verified', true)
-      }
-
-      // 추천 도구만
-      if (filters.featuredOnly) {
-        queryBuilder = queryBuilder.eq('is_featured', true)
-      }
-
-      // 태그 필터
-      if (filters.tags && filters.tags.length > 0) {
-        queryBuilder = queryBuilder.overlaps('tags', filters.tags)
-      }
-
-      // 정렬
-      const sortBy = options.sortBy || 'popularity'
-      switch (sortBy) {
-        case 'rating':
-          queryBuilder = queryBuilder.order('rating', { ascending: false })
-          break
-        case 'newest':
-          queryBuilder = queryBuilder.order('created_at', { ascending: false })
-          break
-        case 'name':
-          queryBuilder = queryBuilder.order('name', { ascending: true })
-          break
-        case 'views':
-          queryBuilder = queryBuilder.order('view_count', { ascending: false })
-          break
-        case 'bookmarks':
-          queryBuilder = queryBuilder.order('bookmark_count', { ascending: false })
-          break
-        default: // popularity
-          queryBuilder = queryBuilder.order('view_count', { ascending: false })
-          queryBuilder = queryBuilder.order('rating', { ascending: false })
-      }
-
-      // 페이지네이션
-      const page = options.page || 1
-      const limit = options.limit || 20
-      const offset = (page - 1) * limit
-
-      queryBuilder = queryBuilder.range(offset, offset + limit - 1)
-
-      const { data, error, count } = await queryBuilder
-
-      if (error) throw error
-
-      return {
-        data: data || [],
-        count: count || 0,
-        page,
-        limit,
-        totalPages: Math.ceil((count || 0) / limit)
-      }
-    } catch (error) {
-      console.error('Search tools error:', error)
-      return {
-        data: [],
-        count: 0,
-        page: 1,
-        limit: 20,
-        totalPages: 0,
-        error
-      }
-    }
+function expandQuery(q) {
+  const terms = q.trim().split(/\s+/);
+  const bag = new Set();
+  for (const t of terms) {
+    bag.add(t);
+    const syns = SYN[t] || [];
+    for (const s of syns) bag.add(s);
   }
+  return Array.from(bag);
+}
+
+// === [REPLACE] 검색 함수 ===
+export async function searchTools(query, filters = {}, options = {}) {
+  console.log('searchTools called with:', { query, filters, options });
+  let qb = supabase.from('ai_tools').select('*', { count: 'exact' });
+
+  // Apply search query
+  if (query && query.trim()) {
+    const terms = expandQuery(query);
+    console.log('Expanded terms:', terms);
+
+    const searchColumns = ['name', 'description', 'category', 'subcategory'];
+
+    const orConditions = [];
+
+    terms.forEach(term => {
+      const p = `%${term.toLowerCase()}%`;
+      searchColumns.forEach(column => {
+        orConditions.push(`${column}.ilike.${p}`);
+      });
+    });
+    console.log('Generated OR conditions:', orConditions);
+    qb = qb.or(orConditions.join(','));
+  }
+
+  // Apply filters
+  if (filters.category && filters.category !== 'all') {
+    qb = qb.eq('category', filters.category);
+  }
+  if (filters.subcategory) {
+    qb = qb.eq('subcategory', filters.subcategory);
+  }
+  if (filters.pricing && filters.pricing.length > 0) {
+    qb = qb.in('pricing_type', filters.pricing);
+  }
+  if (filters.minRating && filters.minRating > 0) {
+    qb = qb.gte('rating', filters.minRating);
+  }
+  if (filters.verifiedOnly) {
+    qb = qb.eq('is_verified', true);
+  }
+  if (filters.featuredOnly) {
+    qb = qb.eq('is_featured', true);
+  }
+  if (filters.tags && filters.tags.length > 0) {
+    qb = qb.overlaps('tags', filters.tags);
+  }
+
+  // Apply sorting
+  const sortBy = options.sortBy || 'popularity';
+  switch (sortBy) {
+    case 'rating':
+      qb = qb.order('rating', { ascending: false });
+      break;
+    case 'newest':
+      qb = qb.order('created_at', { ascending: false });
+      break;
+    case 'name':
+      qb = qb.order('name', { ascending: true });
+      break;
+    case 'views':
+      qb = qb.order('view_count', { ascending: false });
+      break;
+    case 'bookmarks':
+      qb = qb.order('bookmark_count', { ascending: false });
+      break;
+    default: // popularity
+      qb = qb.order('view_count', { ascending: false });
+      qb = qb.order('rating', { ascending: false });
+  }
+
+  // Apply pagination
+  const page = options.page || 1;
+  const limit = options.limit || 50; // Default to 50 for search results
+  const offset = (page - 1) * limit;
+  qb = qb.range(offset, offset + limit - 1);
+
+  const { data, error, count } = await qb;
+  console.log('Supabase raw response data:', data);
+  console.log('Supabase error:', error);
+  console.log('Supabase count:', count);
+
+  if (error) {
+    console.error('Search tools error:', error);
+    return {
+      data: [],
+      count: 0,
+      page: 1,
+      limit: limit,
+      totalPages: 0,
+      error
+    };
+  }
+
+  return {
+    data: data || [],
+    count: count || 0,
+    page,
+    limit,
+    totalPages: Math.ceil((count || 0) / limit)
+  };
+}
+
+export class AIToolsService {
 
   // 도구 상세 정보 조회
   static async getToolById(id) {

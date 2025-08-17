@@ -2,13 +2,13 @@
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+const supabasePublishableKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
 
-if (!supabaseUrl || !supabaseAnonKey) {
+if (!supabaseUrl || !supabasePublishableKey) {
   throw new Error('Missing Supabase environment variables')
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+export const supabase = createClient(supabaseUrl, supabasePublishableKey, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
@@ -16,12 +16,12 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   }
 })
 
-// 타입 정의 (TypeScript 사용시)
+// 상수 정의
 export const SUBSCRIPTION_TIERS = {
   FREE: 'free',
   BASIC: 'basic', 
   PRO: 'pro'
-} as const
+}
 
 export const ACTIVITY_TYPES = {
   VIEW: 'view',
@@ -29,10 +29,10 @@ export const ACTIVITY_TYPES = {
   BOOKMARK: 'bookmark',
   UNBOOKMARK: 'unbookmark',
   CLICK: 'click'
-} as const
+}
 
 export const PRICING_TYPES = {
   FREE: 'free',
   FREEMIUM: 'freemium',
   PAID: 'paid'
-} as const
+}

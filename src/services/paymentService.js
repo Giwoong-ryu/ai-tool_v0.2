@@ -1,4 +1,4 @@
-// src/services/paymentService.js
+// src/services/paymentService.js - 토스페이먼츠 통합 버전
 import { supabase } from '../lib/supabase.js'
 import toast from 'react-hot-toast'
 
@@ -17,7 +17,7 @@ export class PaymentService {
         '이메일 지원'
       ],
       limits: {
-        monthly_searches: -1, // 무제한
+        monthly_searches: -1,
         bookmarks: -1,
         collections: 5
       }
@@ -63,8 +63,8 @@ export class PaymentService {
         .insert([{
           user_id: userId,
           amount: amount,
-          currency: plan.currency,
-          payment_method: 'card',
+          currency: 'KRW',
+          payment_method: 'toss',
           order_id: orderId,
           status: 'pending'
         }])
@@ -78,10 +78,8 @@ export class PaymentService {
         paymentData: {
           amount: amount,
           orderId: orderId,
-          orderName: `${plan.name} 플랜 (${billingCycle === 'yearly' ? '연간' : '월간'})`,
-          customerEmail: null, // 토스페이먼츠에서 자동으로 수집
-          successUrl: `${window.location.origin}/payment/success`,
-          failUrl: `${window.location.origin}/payment/fail`
+          orderName: `${plan.name} Plan (${billingCycle === 'yearly' ? 'Annual' : 'Monthly'})`,
+          currency: 'KRW'
         }
       }
     } catch (error) {
@@ -95,18 +93,21 @@ export class PaymentService {
   static async requestTossPayment(paymentData) {
     try {
       // 토스페이먼츠 SDK 로드
-      const { loadTossPayments } = await import('@toss/payment-sdk')
-      
-      const tossPayments = await loadTossPayments(import.meta.env.VITE_TOSS_CLIENT_KEY)
-      
-      // 결제창 호출
-      await tossPayments.requestPayment('카드', {
+      if (!window.TossPayments) {
+        await this.loadTossScript()
+      }
+
+      const tossPayments = window.TossPayments(import.meta.env.VITE_TOSS_CLIENT_KEY)
+
+      // 결제 요청 (await 제거 - 리다이렉트되므로 기다리지 않음)
+      tossPayments.requestPayment('카드', {
         amount: paymentData.amount,
         orderId: paymentData.orderId,
         orderName: paymentData.orderName,
-        customerEmail: paymentData.customerEmail,
-        successUrl: paymentData.successUrl,
-        failUrl: paymentData.failUrl
+        successUrl: `${window.location.origin}/payment/success`,
+        failUrl: `${window.location.origin}/payment/fail`,
+        customerName: '고객',
+        customerEmail: 'customer@example.com',
       })
 
     } catch (error) {
@@ -117,17 +118,32 @@ export class PaymentService {
       } else {
         toast.error('결제 요청 중 오류가 발생했습니다.')
       }
-      
       throw error
     }
   }
 
-  // 결제 성공 처리 (간단한 버전 - 실제로는 서버에서 처리해야 함)
+  // 토스페이먼츠 SDK 로드
+  static async loadTossScript() {
+    return new Promise((resolve, reject) => {
+      if (window.TossPayments) {
+        resolve()
+        return
+      }
+
+      const script = document.createElement('script')
+      script.src = 'https://js.tosspayments.com/v1/payment'
+      script.onload = resolve
+      script.onerror = reject
+      document.head.appendChild(script)
+    })
+  }
+
+  // 결제 성공 처리 (웹훅이나 리다이렉트에서 호출)
   static async confirmPayment(paymentKey, orderId, amount) {
     try {
-      // 실제 구현에서는 백엔드 API를 호출해야 함
-      // 여기서는 간단히 DB 업데이트만 수행
+      console.log('결제 확인 시작:', { paymentKey, orderId, amount })
       
+      // 임시로 DB만 업데이트 (실제로는 백엔드에서 토스 API 호출 후 처리)
       const { error: updateError } = await supabase
         .from('payments')
         .update({
@@ -137,27 +153,33 @@ export class PaymentService {
         })
         .eq('order_id', orderId)
 
-      if (updateError) throw updateError
+      if (updateError) {
+        console.error('DB 업데이트 오류:', updateError)
+        throw updateError
+      }
 
       // 구독 정보 생성/업데이트
       await this.updateSubscription(orderId)
 
-      toast.success('결제가 완료되었습니다!')
-      return { success: true }
+      console.log('결제 확인 완료')
+      return { success: true, paymentResult: { paymentKey, orderId, amount } }
 
     } catch (error) {
       console.error('Payment confirmation error:', error)
       
       // 결제 실패 상태 업데이트
-      await supabase
-        .from('payments')
-        .update({
-          status: 'failed',
-          failed_reason: error.message
-        })
-        .eq('order_id', orderId)
+      try {
+        await supabase
+          .from('payments')
+          .update({
+            status: 'failed',
+            failed_reason: error.message
+          })
+          .eq('order_id', orderId)
+      } catch (updateError) {
+        console.error('실패 상태 업데이트 오류:', updateError)
+      }
 
-      toast.error('결제 확인 중 오류가 발생했습니다.')
       throw error
     }
   }
@@ -165,7 +187,6 @@ export class PaymentService {
   // 구독 정보 업데이트
   static async updateSubscription(orderId) {
     try {
-      // 결제 정보 조회
       const { data: payment, error: paymentError } = await supabase
         .from('payments')
         .select('*')
@@ -174,18 +195,15 @@ export class PaymentService {
 
       if (paymentError) throw paymentError
 
-      // 플랜 타입 추출 (orderId에서)
       const planType = this.extractPlanFromOrderId(orderId)
       const plan = this.PLANS[planType]
 
       if (!plan) throw new Error('Invalid plan type')
 
-      // 구독 만료일 계산 (월간/연간)
       const expiresAt = new Date()
-      const isYearly = payment.amount > plan.price * 2 // 연간 결제 판단
+      const isYearly = payment.amount > plan.price * 2
       expiresAt.setMonth(expiresAt.getMonth() + (isYearly ? 12 : 1))
 
-      // 기존 구독 조회
       const { data: existingSubscription } = await supabase
         .from('subscriptions')
         .select('*')
@@ -194,7 +212,6 @@ export class PaymentService {
         .single()
 
       if (existingSubscription) {
-        // 기존 구독 업데이트
         const { error: updateError } = await supabase
           .from('subscriptions')
           .update({
@@ -206,7 +223,6 @@ export class PaymentService {
 
         if (updateError) throw updateError
       } else {
-        // 새 구독 생성
         const { error: insertError } = await supabase
           .from('subscriptions')
           .insert([{
@@ -221,7 +237,6 @@ export class PaymentService {
         if (insertError) throw insertError
       }
 
-      // 사용자 프로필 업데이트
       const { error: profileError } = await supabase
         .from('user_profiles')
         .update({
@@ -233,94 +248,13 @@ export class PaymentService {
 
       if (profileError) throw profileError
 
-      // 결제 정보에 구독 ID 연결
-      const { data: subscription } = await supabase
-        .from('subscriptions')
-        .select('id')
-        .eq('user_id', payment.user_id)
-        .eq('status', 'active')
-        .single()
-
-      if (subscription) {
-        await supabase
-          .from('payments')
-          .update({ subscription_id: subscription.id })
-          .eq('id', payment.id)
-      }
-
     } catch (error) {
       console.error('Update subscription error:', error)
       throw error
     }
   }
 
-  // 구독 취소
-  static async cancelSubscription(userId) {
-    try {
-      const { error } = await supabase
-        .from('subscriptions')
-        .update({
-          status: 'cancelled',
-          auto_renew: false,
-          updated_at: new Date().toISOString()
-        })
-        .eq('user_id', userId)
-        .eq('status', 'active')
-
-      if (error) throw error
-
-      toast.success('구독이 취소되었습니다. 현재 기간이 끝날 때까지 서비스를 이용할 수 있습니다.')
-      return { success: true }
-
-    } catch (error) {
-      console.error('Cancel subscription error:', error)
-      toast.error('구독 취소 중 오류가 발생했습니다.')
-      throw error
-    }
-  }
-
-  // 결제 내역 조회
-  static async getPaymentHistory(userId) {
-    try {
-      const { data, error } = await supabase
-        .from('payments')
-        .select(`
-          *,
-          subscriptions (
-            subscription_tier,
-            status
-          )
-        `)
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false })
-
-      if (error) throw error
-
-      return data || []
-    } catch (error) {
-      console.error('Get payment history error:', error)
-      return []
-    }
-  }
-
-  // 현재 구독 정보 조회
-  static async getCurrentSubscription(userId) {
-    try {
-      const { data, error } = await supabase
-        .from('subscriptions')
-        .select('*')
-        .eq('user_id', userId)
-        .eq('status', 'active')
-        .single()
-
-      return { data, error }
-    } catch (error) {
-      console.error('Get current subscription error:', error)
-      return { data: null, error }
-    }
-  }
-
-  // 유틸리티 함수들
+  // 기타 유틸리티 메서드들
   static generateOrderId(userId, planType) {
     const timestamp = Date.now()
     const random = Math.random().toString(36).substring(2, 8)
@@ -336,6 +270,68 @@ export class PaymentService {
       style: 'currency',
       currency: currency
     }).format(amount)
+  }
+
+  static async cancelSubscription(userId) {
+    try {
+      const { error } = await supabase
+        .from('subscriptions')
+        .update({
+          status: 'cancelled',
+          auto_renew: false,
+          updated_at: new Date().toISOString()
+        })
+        .eq('user_id', userId)
+        .eq('status', 'active')
+
+      if (error) throw error
+
+      toast.success('구독이 취소되었습니다.')
+      return { success: true }
+
+    } catch (error) {
+      console.error('Cancel subscription error:', error)
+      toast.error('구독 취소 중 오류가 발생했습니다.')
+      throw error
+    }
+  }
+
+  static async getPaymentHistory(userId) {
+    try {
+      const { data, error } = await supabase
+        .from('payments')
+        .select(`
+          *,
+          subscriptions (
+            subscription_tier,
+            status
+          )
+        `)
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+
+      if (error) throw error
+      return data || []
+    } catch (error) {
+      console.error('Get payment history error:', error)
+      return []
+    }
+  }
+
+  static async getCurrentSubscription(userId) {
+    try {
+      const { data, error } = await supabase
+        .from('subscriptions')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('status', 'active')
+        .single()
+
+      return { data, error }
+    } catch (error) {
+      console.error('Get current subscription error:', error)
+      return { data: null, error }
+    }
   }
 
   static isSubscriptionActive(subscription) {

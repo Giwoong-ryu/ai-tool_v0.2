@@ -1,0 +1,103 @@
+로드맵_기능 구현
+
+
+1) 제품 맵 (세 기둥 + 한 허브)
+허브(검색/목표 입력 1곳): “하고 싶은 일” 한 줄 입력 → 아래 3축이 동시에 제안됨.
+
+도구 라이브러리: 작업에 맞는 모델/앱 추천(설명·가격·강점·단점·단축키/베스트 프랙티스).
+
+프롬프트 제작소: 선택값(톤, 길이, 포맷 등)으로 템플릿을 즉시 컴파일 → 복사/즐겨찾기/버전 관리.
+
+워크플로우 실행기: 여러 도구를 순서화(1–N단계). 각 단계에 “프롬프트+실행 가이드+산출물 슬롯”을 제공.
+
+UX 흐름은 “목표 입력 → 추천(도구/템플릿/워크플로우) → 한 번 클릭으로 연결/복사 → 산출물 저장/공유”로 직선화.
+
+2) 데이터 모델 (Supabase 기준 핵심 테이블)
+tools: AI 도구 메타(카테고리, 가격, URL, 태그).
+
+prompt_templates: 템플릿 본문, 변수 스키마(JSON), 카테고리, 권한(free/pro).
+
+workflows · workflow_steps: 단계별 사용 도구, 프롬프트 연결, 체크리스트.
+
+runs · run_steps: 사용자 실행 이력/산출물/피드백.
+
+bookmarks, ratings, usage_events, subscriptions, transactions.
+
+profiles: Clerk 사용자와 1:1(역할, 한도, 플랜).
+
+RLS 예시: runs.user_id = auth.uid()만 조회·수정 가능. prompt_templates는 is_public OR created_by = auth.uid().
+
+3) 통합 아키텍처 (Clerk · Supabase · PayPal · GA4)
+인증: Clerk(세션/웹훅) → profiles 동기화.
+
+DB/파일: Supabase(Postgres + Storage). 프롬프트/산출물 버전 파일은 Storage 폴더 단위로.
+
+결제: PayPal(정기/일회) → **Edge Function(Webhook)**에서 subscriptions 갱신 + 영수증 transactions 기록.
+
+사용량 계측: 프롬프트 생성/워크플로우 실행 시 usage_events 삽입 → 월별 합계로 플랜 한도 체크(soft gate → 하드 블록).
+
+분석: GA4에 select_template, compile_prompt, start_workflow, complete_step 등 커스텀 이벤트 통일.
+
+4) 프롬프트 엔진 (고급 모드 호환)
+스키마 우선: 템플릿마다 zod/JSON Schema로 변수 정의(필수/기본값/설명/옵션).
+
+컴파일러: Mustache/Handlebars 스타일 + 후처리(불릿→마크다운, 토큰 길이 제한).
+
+버저닝: prompt_templates(id, version, status) → 사용자는 fork로 자기 버전 생성.
+
+미리보기 비교: “간단 vs 고급” 두 결과를 나란히 렌더, 클릭 한 번으로 교체.
+
+5) 워크플로우 러너 (반자동)
+단계 타입: manual(외부 도구 열기/복사), instruction(체크리스트), generator(내장 프롬프트 컴파일).
+
+상태 관리: 각 run_step에 입력/출력/노트/체크 상태 저장 → 재개/되돌리기.
+
+공유: 완료 후 share_token으로 읽기 전용 페이지 생성(이미지/슬라이드 링크 포함).
+
+6) 추천/검색 (한 곳에서 전부)
+하나의 인덱스: search_index(item_type, item_id, title, tags, tsv, embedding).
+
+빠른 1차는 pg_trgm/TSVector, 품질 향상은 pgvector로 임베딩 검색(템플릿·도구·워크플로우를 한 번에 랭킹).
+
+클릭/완료율을 랭킹 피드백에 반영(“학습형 추천”).
+
+7) 권한·요금 정책
+Free: 템플릿/워크플로우 일부 열람, 프롬프트 컴파일 일 N회, 실행 기록 저장 제한.
+
+Pro: 무제한 컴파일, 워크플로우 러너 전체, 버전/공유, 팀 보관함, 템플릿 비공개 저장.
+
+엣지 함수의 가드: 요청마다 profiles.plan과 월별 usage_events 합계를 체크.
+
+8) 이벤트 파이프라인 (한 눈에)
+FE: 모든 핵심 액션 → track('event_name', payload)
+
+BE(Edge Function): POST /events → usage_events insert → 한도 초과 시 402 반환
+
+GA4: 동일 이벤트명으로 송신(디버그 뷰로 일치성 확인)
+
+9) 화면 설계 포인트 (지금 코드에 딱 얹기)
+허브 상단: “목표 입력” + 즉시 3열 카드(도구·템플릿·워크플로우) 추천.
+
+사이드 패널: 프롬프트 실시간 컴파일 결과 + “복사/북마크/실행으로 보내기”.
+
+실행기: 타임라인(1→N) + 각 단계 카드에 “복사”, “열기”, “완료 체크”, “메모”.
+
+상단 고정 바: 진행률, 되돌리기, 완료 공유.
+
+10) 릴리스 플랜 (3 스프린트)
+S1 · 통합 허브 + 프롬프트 엔진: 템플릿 스키마·컴파일·북마크·사용량 계측.
+
+S2 · 워크플로우 러너: run/step 저장, 공유, 재개. 추천 인덱스 1차(키워드/태그).
+
+S3 · 과금/팀: PayPal 정기결제, Pro 가드, 팀 보관함, 추천 고도화(pgvector).
+
+11) 체크리스트 (운영 리스크를 초반에 제거)
+ Edge Functions: Clerk/PayPal 웹훅 검증 및 재시도 큐
+
+ RLS 전면 적용(템플릿·런 기록) + 관리자 역할
+
+ 비밀키는 서버 전용(프론트에 노출 금지)
+
+ GA4 커스텀 이벤트 스펙 문서화
+
+ 백업: 템플릿/워크플로우 스냅샷 크론

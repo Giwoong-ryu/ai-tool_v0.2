@@ -1,5 +1,6 @@
 {
   "recommendations": [
+    "saoudrizwan.claude-dev",
     "esbenp.prettier-vscode",
     "bradlc.vscode-tailwindcss",
     "formulahendry.auto-rename-tag",

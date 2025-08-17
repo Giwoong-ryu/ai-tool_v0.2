@@ -1,92 +1,124 @@
-import React from 'react';
-import { usePromptStore } from '../../../store/promptStore';
-import { Button } from '../../../components/ui/button';
-import { Card, CardContent } from '../../../components/ui/card';
+// src/features/prompt-launcher/components/ActionButtons.jsx
+import React from 'react'
+import { Button } from '../../../components/ui/button.jsx'
+import { Card, CardContent } from '../../../components/ui/card.jsx'
+import { RotateCcw, Download, Share2, BookOpen } from 'lucide-react'
+import { usePromptStore } from '../../../store/promptStore.js'
+import toast from 'react-hot-toast'
 
 const ActionButtons = () => {
-  const { currentTemplate, selections, generatePrompt, toggleComparison, saveBookmark } = usePromptStore();
+  // Store를 안전하게 사용
+  let generatedPrompt = ''
+  let resetPrompt = () => {}
+  
+  try {
+    const promptData = usePromptStore()
+    generatedPrompt = promptData.generatedPrompt || ''
+    resetPrompt = promptData.resetPrompt
+  } catch (error) {
+    console.warn('Prompt store error in ActionButtons:', error)
+  }
 
-  const handleCopyAndSend = () => {
-    if (!currentTemplate) return;
+  const handleReset = () => {
+    resetPrompt()
+    toast.success('설정이 초기화되었습니다.')
+  }
 
-    const prompt = generatePrompt();
+  const handleDownload = () => {
+    if (!generatedPrompt) {
+      toast.error('먼저 프롬프트를 생성해주세요.')
+      return
+    }
+
+    const element = document.createElement('a')
+    const file = new Blob([generatedPrompt], { type: 'text/plain' })
+    element.href = URL.createObjectURL(file)
+    element.download = `prompt_${new Date().toISOString().slice(0, 10)}.txt`
+    document.body.appendChild(element)
+    element.click()
+    document.body.removeChild(element)
     
-    // 클립보드에 복사
-    navigator.clipboard.writeText(prompt).then(() => {
-      alert('프롬프트가 클립보드에 복사되었습니다!');
-    });
+    toast.success('프롬프트 파일이 다운로드되었습니다!')
+  }
 
-    // 추천 모델로 새 탭 열기
-    const primaryModel = currentTemplate.modelHints?.primary;
-    let targetUrl = '';
-
-    switch (primaryModel) {
-      case 'ChatGPT':
-        targetUrl = 'https://chat.openai.com/';
-        break;
-      case 'Claude':
-        targetUrl = 'https://claude.ai/';
-        break;
-      case 'Gemini':
-        targetUrl = 'https://gemini.google.com/';
-        break;
-      default:
-        targetUrl = 'https://www.google.com/search?q=' + encodeURIComponent(primaryModel + ' AI');
+  const handleShare = async () => {
+    if (!generatedPrompt) {
+      toast.error('먼저 프롬프트를 생성해주세요.')
+      return
     }
 
-    if (targetUrl) {
-      window.open(targetUrl, '_blank');
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: '이지픽에서 생성한 프롬프트',
+          text: generatedPrompt.substring(0, 100) + '...',
+          url: window.location.href
+        })
+      } else {
+        // 폴백: 클립보드에 복사
+        await navigator.clipboard.writeText(generatedPrompt)
+        toast.success('프롬프트가 클립보드에 복사되었습니다!')
+      }
+    } catch (error) {
+      console.error('Share failed:', error)
+      toast.error('공유에 실패했습니다.')
     }
-  };
-
-  const handleBookmark = () => {
-    saveBookmark();
-    alert('북마크에 저장되었습니다!');
-  };
+  }
 
   return (
     <Card>
-      <CardContent className="pt-6">
+      <CardContent className="p-4">
         <div className="space-y-3">
-          <Button 
-            onClick={handleCopyAndSend}
-            disabled={!currentTemplate}
-            className="w-full"
-            size="lg"
-          >
-            📋 복사 + AI 모델로 전송
-          </Button>
+          <h3 className="font-medium text-gray-900">추가 작업</h3>
           
           <div className="grid grid-cols-2 gap-2">
-            <Button 
-              variant="outline" 
-              onClick={toggleComparison}
-              disabled={!currentTemplate}
-              size="sm"
+            <Button
+              onClick={handleReset}
+              variant="outline"
+              className="flex items-center gap-2"
             >
-              비교보기
+              <RotateCcw className="w-4 h-4" />
+              다시 시작
             </Button>
-            <Button 
-              variant="outline" 
-              onClick={handleBookmark}
-              disabled={!currentTemplate}
-              size="sm"
+            
+            <Button
+              onClick={handleDownload}
+              variant="outline"
+              disabled={!generatedPrompt}
+              className="flex items-center gap-2"
             >
-              북마크
+              <Download className="w-4 h-4" />
+              다운로드
             </Button>
           </div>
-
-          {currentTemplate && (
-            <div className="mt-4 p-3 bg-blue-50 rounded-md border border-blue-200">
-              <p className="text-xs text-blue-800">
-                <strong>추천:</strong> {currentTemplate.modelHints?.primary} - {currentTemplate.modelHints?.rationale}
-              </p>
-            </div>
-          )}
+          
+          <Button
+            onClick={handleShare}
+            disabled={!generatedPrompt}
+            variant="outline"
+            className="w-full flex items-center gap-2"
+          >
+            <Share2 className="w-4 h-4" />
+            공유하기
+          </Button>
+          
+          <div className="pt-2 border-t">
+            <Button
+              onClick={() => window.open('https://chat.openai.com', '_blank')}
+              className="w-full bg-green-600 hover:bg-green-700 text-white"
+            >
+              <BookOpen className="w-4 h-4 mr-2" />
+              ChatGPT에서 사용하기
+            </Button>
+          </div>
+          
+          <div className="text-xs text-gray-500 text-center">
+            💡 생성된 프롬프트를 복사해서 AI 도구에 붙여넣으세요
+          </div>
         </div>
       </CardContent>
     </Card>
-  );
-};
+  )
+}
 
-export default ActionButtons;
+export default ActionButtons

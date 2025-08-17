@@ -1,0 +1,19 @@
+17 Specialized Commands
+Development: /sg:implement, /sg:build, /sg:design
+Analysis: /sg:analyze, /sg:troubleshoot, /sg:explain
+Quality: /sg:improve, /sg:test, /sg:cleanup
+Planning: /sg:workflow, /sg:task, /sg:estimate
+Others: /sg:document, /sg:git, /sg:index, /sg:load, /sg:spawn
+
+🎭 Domain-Specific Personas
+architect - Systems design and architecture
+frontend - UI/UX development and accessibility
+backend - Server-side development and infrastructure
+analyzer - Debugging and investigation
+security - Security analysis and vulnerabilities
+scribe - Documentation and technical writing
+
+🔌 MCP Server Integration
+Context7 - Official library documentation
+Sequential - Multi-step analysis (--seq flag)
+Playwright - Browser automation and testing

@@ -6,6 +6,8 @@ export class AuthService {
   // 회원가입
   static async signUp(email, password, name) {
     try {
+      console.log('🚀 회원가입 시작:', { email, name })
+      
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -16,13 +18,26 @@ export class AuthService {
         }
       })
 
-      if (error) throw error
+      console.log('📧 Supabase Auth 응답:', { data, error })
 
-      // 사용자 프로필 생성
-      if (data.user) {
+      if (error) {
+        console.error('❌ Auth 오류:', error)
+        throw error
+      }
+
+      // 사용자 프로필 생성 (사용자가 이메일 확인 후 트리거에서 처리)
+      if (data.user && !data.user.email_confirmed_at) {
+        console.log('✉️ 이메일 확인 대기 중...')
+        toast.success('회원가입이 완료되었습니다! 이메일을 확인해주세요.')
+        return { data, error: null }
+      }
+
+      // 이메일이 확인된 경우 즉시 프로필 생성
+      if (data.user && data.user.email_confirmed_at) {
+        console.log('👤 사용자 프로필 생성 중...')
         const { error: profileError } = await supabase
           .from('user_profiles')
-          .insert([{
+          .upsert([{
             id: data.user.id,
             email: data.user.email,
             name: name,
@@ -32,15 +47,17 @@ export class AuthService {
           }])
 
         if (profileError) {
-          console.error('Profile creation error:', profileError)
+          console.error('❌ 프로필 생성 오류:', profileError)
           // 프로필 생성 실패해도 회원가입은 성공으로 처리
+        } else {
+          console.log('✅ 프로필 생성 완료')
         }
       }
 
       toast.success('회원가입이 완료되었습니다! 이메일을 확인해주세요.')
       return { data, error: null }
     } catch (error) {
-      console.error('SignUp error:', error)
+      console.error('❌ SignUp error:', error)
       const message = this.getErrorMessage(error)
       toast.error(message)
       return { data: null, error }
@@ -50,17 +67,48 @@ export class AuthService {
   // 로그인
   static async signIn(email, password) {
     try {
+      console.log('🔐 로그인 시도:', email)
+      
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password
       })
 
+      console.log('🔐 로그인 응답:', { data, error })
+
       if (error) throw error
+
+      // 프로필이 없다면 생성
+      if (data.user) {
+        const { data: existingProfile } = await supabase
+          .from('user_profiles')
+          .select('*')
+          .eq('id', data.user.id)
+          .single()
+
+        if (!existingProfile) {
+          console.log('👤 프로필 생성 (로그인시)')
+          const { error: profileError } = await supabase
+            .from('user_profiles')
+            .insert([{
+              id: data.user.id,
+              email: data.user.email,
+              name: data.user.user_metadata?.name || '사용자',
+              subscription_tier: 'free',
+              usage_count: 0,
+              monthly_limit: 10
+            }])
+
+          if (profileError) {
+            console.error('❌ 프로필 생성 오류 (로그인시):', profileError)
+          }
+        }
+      }
 
       toast.success('로그인되었습니다!')
       return { data, error: null }
     } catch (error) {
-      console.error('SignIn error:', error)
+      console.error('❌ SignIn error:', error)
       const message = this.getErrorMessage(error)
       toast.error(message)
       return { data: null, error }
@@ -187,7 +235,10 @@ export class AuthService {
       'User already registered': '이미 가입된 이메일입니다.',
       'Password should be at least 6 characters': '비밀번호는 최소 6자 이상이어야 합니다.',
       'Unable to validate email address: invalid format': '이메일 형식이 올바르지 않습니다.',
-      'Email rate limit exceeded': '이메일 전송 한도를 초과했습니다. 잠시 후 다시 시도해주세요.'
+      'Email rate limit exceeded': '이메일 전송 한도를 초과했습니다. 잠시 후 다시 시도해주세요.',
+      'Signup is disabled': '회원가입이 비활성화되어 있습니다.',
+      'Email link is invalid or has expired': '이메일 링크가 유효하지 않거나 만료되었습니다.',
+      'Too many requests': '너무 많은 요청이 발생했습니다. 잠시 후 다시 시도해주세요.'
     }
 
     return errorMessages[error.message] || error.message || '알 수 없는 오류가 발생했습니다.'

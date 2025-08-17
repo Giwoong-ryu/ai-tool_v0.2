@@ -1,138 +1,130 @@
-import React, { useState } from 'react';
-import { usePromptStore } from '../../../store/promptStore';
-import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
-import { Button } from '../../../components/ui/button';
-import { Popover, PopoverContent, PopoverTrigger } from '../../../components/ui/popover';
-import { Input } from '../../../components/ui/input';
+// src/features/prompt-launcher/components/PromptPreview.jsx
+import React from 'react'
+import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card.jsx'
+import { Button } from '../../../components/ui/button.jsx'
+import { Copy, Wand2 } from 'lucide-react'
+import { usePromptStore } from '../../../store/promptStore.js'
+import toast from 'react-hot-toast'
 
 const PromptPreview = () => {
-  const { currentTemplate, selections, setFieldValue, generatePrompt } = usePromptStore();
-  const [openPopovers, setOpenPopovers] = useState({});
-  const [customInputs, setCustomInputs] = useState({});
-  const [showCustomInput, setShowCustomInput] = useState({});
+  // Store를 안전하게 사용
+  let currentTemplate = null
+  let selectedOptions = {}
+  let generatedPrompt = ''
+  let generatePrompt = () => ''
+  
+  try {
+    const promptData = usePromptStore()
+    currentTemplate = promptData.currentTemplate
+    selectedOptions = promptData.selectedOptions || {}
+    generatedPrompt = promptData.generatedPrompt || ''
+    generatePrompt = promptData.generatePrompt
+  } catch (error) {
+    console.warn('Prompt store error in PromptPreview:', error)
+  }
 
-  const handleFieldChange = (fieldId, value) => {
-    if (value === "직접입력") {
-      setShowCustomInput(prev => ({ ...prev, [fieldId]: true }));
-      setOpenPopovers(prev => ({ ...prev, [fieldId]: false }));
-    } else {
-      setFieldValue(fieldId, value);
-      setShowCustomInput(prev => ({ ...prev, [fieldId]: false }));
-      setOpenPopovers(prev => ({ ...prev, [fieldId]: false }));
-    }
-  };
-
-  const handleCustomInput = (fieldId, value) => {
-    setCustomInputs(prev => ({ ...prev, [fieldId]: value }));
-    setFieldValue(fieldId, value);
-  };
-
-  // 개별 필드 버튼 렌더링 함수
-  const renderFieldButton = (fieldId) => {
-    const field = currentTemplate.fields?.find(f => f.id === fieldId);
-    if (!field || !field.options || field.options.length === 0) {
-      return <span className="text-slate-600">{currentTemplate.defaults[fieldId] || fieldId}</span>;
+  const handleGeneratePrompt = () => {
+    if (!currentTemplate) {
+      toast.error('먼저 템플릿을 선택해주세요.')
+      return
     }
 
-    const currentValue = selections[fieldId] || currentTemplate.defaults[fieldId] || field.options[0];
-    const isCustomInput = showCustomInput[fieldId];
-
-    if (isCustomInput) {
-      return (
-        <div className="inline-flex items-center gap-2">
-          <span>[</span>
-          <Input
-            type="text"
-            placeholder="직접 입력하세요"
-            value={customInputs[fieldId] || ''}
-            onChange={(e) => handleCustomInput(fieldId, e.target.value)}
-            className="w-32 h-8 px-2 py-1 text-sm border border-blue-300 rounded focus:border-blue-500"
-            autoFocus
-          />
-          <span>]</span>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="h-6 px-2 text-xs"
-            onClick={() => setShowCustomInput(prev => ({ ...prev, [fieldId]: false }))}
-          >
-            ✕
-          </Button>
-        </div>
-      );
+    // 필수 옵션 체크
+    const requiredOptions = currentTemplate.options.filter(opt => opt.required)
+    const missingOptions = requiredOptions.filter(opt => !selectedOptions[opt.key])
+    
+    if (missingOptions.length > 0) {
+      toast.error(`필수 항목을 입력해주세요: ${missingOptions.map(opt => opt.label).join(', ')}`)
+      return
     }
 
-    return (
-      <Popover
-        open={openPopovers[fieldId] || false}
-        onOpenChange={(isOpen) => setOpenPopovers(prev => ({ ...prev, [fieldId]: isOpen }))}
-      >
-        <PopoverTrigger asChild>
-          <button 
-            className="inline-flex items-center gap-1 px-3 py-1 mx-1 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-lg font-semibold transition-all duration-200 border border-blue-300 hover:border-blue-400 cursor-pointer"
-          >
-            <span>[{currentValue}]</span>
-            <span className="text-xs">▼</span>
-          </button>
-        </PopoverTrigger>
-        <PopoverContent className="w-auto p-2 bg-white border border-slate-200 shadow-xl rounded-xl z-50">
-          <div className="flex flex-col space-y-1 min-w-[150px]">
-            {field.options.map(option => (
-              <Button
-                key={option}
-                type="button"
-                variant="ghost"
-                className={`justify-start px-3 py-2 rounded-lg transition-all duration-200 text-left hover:bg-slate-50 ${
-                  currentValue === option 
-                    ? 'bg-blue-100 text-blue-800 font-semibold' 
-                    : 'text-slate-700'
-                }`}
-                onClick={() => handleFieldChange(fieldId, option)}
-              >
-                <div className="flex items-center gap-2">
-                  {option === "직접입력" ? (
-                    <>
-                      <span>✏️</span>
-                      <span>{option}</span>
-                    </>
-                  ) : (
-                    <span>{option}</span>
-                  )}
-                </div>
-              </Button>
-            ))}
-          </div>
-        </PopoverContent>
-      </Popover>
-    );
-  };
+    const prompt = generatePrompt()
+    if (prompt) {
+      toast.success('프롬프트가 생성되었습니다!')
+    }
+  }
 
-  // 실제 프롬프트 생성
-  const generatedPrompt = currentTemplate ? generatePrompt() : "템플릿을 선택해주세요.";
+  const handleCopyPrompt = async () => {
+    if (!generatedPrompt) {
+      toast.error('먼저 프롬프트를 생성해주세요.')
+      return
+    }
+
+    try {
+      await navigator.clipboard.writeText(generatedPrompt)
+      toast.success('프롬프트가 클립보드에 복사되었습니다!')
+    } catch (error) {
+      console.error('Copy failed:', error)
+      toast.error('복사에 실패했습니다. 다시 시도해주세요.')
+    }
+  }
 
   return (
-    <Card>
+    <Card className="h-full">
       <CardHeader>
-        <CardTitle className="text-lg">📋 프롬프트 미리보기</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="bg-slate-50 rounded-xl p-6 border border-slate-200">
-          <div className="bg-white rounded-lg p-6 border border-slate-300">
-            <div className="text-base leading-relaxed text-slate-800 whitespace-pre-wrap">
-              {generatedPrompt}
-            </div>
+        <CardTitle className="flex items-center justify-between">
+          <span>생성된 프롬프트</span>
+          <div className="flex gap-2">
+            <Button
+              onClick={handleGeneratePrompt}
+              disabled={!currentTemplate}
+              className="flex items-center gap-2"
+            >
+              <Wand2 className="w-4 h-4" />
+              생성하기
+            </Button>
+            <Button
+              onClick={handleCopyPrompt}
+              disabled={!generatedPrompt}
+              variant="outline"
+              className="flex items-center gap-2"
+            >
+              <Copy className="w-4 h-4" />
+              복사
+            </Button>
           </div>
-        </div>
-        {currentTemplate && (
-          <div className="mt-4 flex items-center justify-between text-xs text-gray-500">
-            <span>추천 모델: {currentTemplate.modelHints?.primary}</span>
-            <span>{Object.keys(selections).length}개 항목 변경됨</span>
+        </CardTitle>
+      </CardHeader>
+      
+      <CardContent>
+        {!currentTemplate ? (
+          <div className="text-center py-8 text-gray-500">
+            <div className="text-4xl mb-4">🎯</div>
+            <p>왼쪽에서 템플릿을 선택해주세요</p>
+          </div>
+        ) : !generatedPrompt ? (
+          <div className="text-center py-8 text-gray-500">
+            <div className="text-4xl mb-4">✨</div>
+            <p>옵션을 설정하고 "생성하기" 버튼을 눌러주세요</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="p-4 bg-gray-50 rounded-lg border">
+              <pre className="whitespace-pre-wrap text-sm text-gray-800 font-mono max-h-96 overflow-y-auto">
+                {generatedPrompt}
+              </pre>
+            </div>
+            
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <span>💡</span>
+              <span>이 프롬프트를 복사해서 ChatGPT, Claude 등의 AI에게 전달하세요</span>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div className="p-3 bg-blue-50 rounded-lg">
+                <div className="font-medium text-blue-900 mb-1">추천 AI 도구</div>
+                <div className="text-blue-700">ChatGPT, Claude, Bard</div>
+              </div>
+              <div className="p-3 bg-green-50 rounded-lg">
+                <div className="font-medium text-green-900 mb-1">글자 수</div>
+                <div className="text-green-700">{generatedPrompt.length.toLocaleString()}자</div>
+              </div>
+            </div>
           </div>
         )}
       </CardContent>
     </Card>
-  );
-};
+  )
+}
 
-export default PromptPreview;
+export default PromptPreview

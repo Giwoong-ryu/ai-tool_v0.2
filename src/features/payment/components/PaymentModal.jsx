@@ -1,4 +1,4 @@
-// src/features/payment/components/PaymentModal.jsx
+// src/features/payment/components/PaymentModal.jsx - 토스페이먼츠 통합 버전
 import React, { useState } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../components/ui/dialog.jsx'
 import { Button } from '../../../components/ui/button.jsx'
@@ -13,7 +13,20 @@ import toast from 'react-hot-toast'
 const PaymentModal = ({ open, onOpenChange, plan = 'basic' }) => {
   const [selectedBilling, setSelectedBilling] = useState('monthly')
   const [isProcessing, setIsProcessing] = useState(false)
-  const { user, profile, updateProfile } = useAuthStore()
+  
+  // AuthStore를 안전하게 사용
+  let user = null
+  let profile = null
+  let updateProfile = () => Promise.resolve({ error: null })
+  
+  try {
+    const authData = useAuthStore()
+    user = authData.user
+    profile = authData.profile
+    updateProfile = authData.updateProfile
+  } catch (error) {
+    console.warn('Auth store error in PaymentModal:', error)
+  }
 
   const currentPlan = PaymentService.PLANS[plan]
 
@@ -21,18 +34,32 @@ const PaymentModal = ({ open, onOpenChange, plan = 'basic' }) => {
     return null
   }
 
-  // 가격 계산
+  // 사용자가 로그인하지 않은 경우 처리
+  if (!user) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-center">로그인 필요</DialogTitle>
+          </DialogHeader>
+          <div className="text-center py-8">
+            <p className="text-gray-600 mb-4">결제를 위해서는 먼저 로그인해주세요.</p>
+            <Button onClick={() => onOpenChange(false)}>
+              확인
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    )
+  }
+
+  // 가격 계산 (KRW 기준)
   const monthlyPrice = currentPlan.price
   const yearlyPrice = Math.floor(monthlyPrice * 12 * 0.8) // 20% 할인
   const yearlyMonthlyPrice = Math.floor(yearlyPrice / 12)
   const yearlySavings = (monthlyPrice * 12) - yearlyPrice
 
   const handlePayment = async () => {
-    if (!user) {
-      toast.error('로그인이 필요합니다.')
-      return
-    }
-
     setIsProcessing(true)
 
     try {
@@ -43,13 +70,16 @@ const PaymentModal = ({ open, onOpenChange, plan = 'basic' }) => {
         selectedBilling
       )
 
-      // 토스페이먼츠 결제창 호출
+      // 토스페이먼츠 결제 처리 전에 모달 닫기
+      onOpenChange(false)
+      
+      // 토스페이먼츠 결제 처리
       await PaymentService.requestTossPayment(paymentData)
 
     } catch (error) {
       console.error('Payment process error:', error)
       
-      if (error.code !== 'USER_CANCEL') {
+      if (error.message !== 'Payment cancelled' && error.code !== 'USER_CANCEL') {
         toast.error('결제 처리 중 오류가 발생했습니다.')
       }
     } finally {
@@ -59,9 +89,12 @@ const PaymentModal = ({ open, onOpenChange, plan = 'basic' }) => {
 
   const PlanIcon = plan === 'pro' ? Crown : Zap
 
+  // 현재 구독 tier 안전하게 가져오기
+  const currentSubscriptionTier = profile?.subscription_tier || 'free'
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-center">
             <div className="flex items-center justify-center gap-2 mb-2">
@@ -73,18 +106,18 @@ const PaymentModal = ({ open, onOpenChange, plan = 'basic' }) => {
 
         <div className="space-y-6">
           {/* 현재 구독 상태 */}
-          {profile?.subscription_tier !== 'free' && (
+          {currentSubscriptionTier !== 'free' && (
             <Alert>
               <AlertDescription>
-                현재 <strong>{profile.subscription_tier}</strong> 플랜을 사용 중입니다.
-                {plan !== profile.subscription_tier && ' 플랜을 변경하시겠습니까?'}
+                현재 <strong>{currentSubscriptionTier}</strong> 플랜을 사용 중입니다.
+                {plan !== currentSubscriptionTier && ' 플랜을 변경하시겠습니까?'}
               </AlertDescription>
             </Alert>
           )}
 
           {/* 요금제 선택 */}
           <div className="space-y-3">
-            <h3 className="font-semibold text-lg">요금제 선택</h3>
+            <h3 className="font-semibold text-lg">결제 주기</h3>
             
             {/* 월간 플랜 */}
             <div 
@@ -109,10 +142,12 @@ const PaymentModal = ({ open, onOpenChange, plan = 'basic' }) => {
                     </div>
                     <span className="font-medium">월간 결제</span>
                   </div>
-                  <p className="text-sm text-gray-500 mt-1">매월 자동 결제</p>
+                  <p className="text-sm text-gray-500 mt-1">매월 결제</p>
                 </div>
                 <div className="text-right">
-                  <div className="text-2xl font-bold">₩{monthlyPrice.toLocaleString()}</div>
+                  <div className="text-2xl font-bold">
+                    {PaymentService.formatPrice(monthlyPrice)}
+                  </div>
                   <div className="text-sm text-gray-500">/ 월</div>
                 </div>
               </div>
@@ -128,7 +163,7 @@ const PaymentModal = ({ open, onOpenChange, plan = 'basic' }) => {
               onClick={() => setSelectedBilling('yearly')}
             >
               <Badge className="absolute -top-2 -right-2 bg-green-500 text-white">
-                20% 절약
+                20% 할인
               </Badge>
               
               <div className="flex items-center justify-between">
@@ -146,11 +181,13 @@ const PaymentModal = ({ open, onOpenChange, plan = 'basic' }) => {
                     <span className="font-medium">연간 결제</span>
                   </div>
                   <p className="text-sm text-gray-500 mt-1">
-                    월 ₩{yearlyMonthlyPrice.toLocaleString()} (₩{yearlySavings.toLocaleString()} 절약)
+                    {PaymentService.formatPrice(yearlyMonthlyPrice)}/월 ({PaymentService.formatPrice(yearlySavings)} 절약)
                   </p>
                 </div>
                 <div className="text-right">
-                  <div className="text-2xl font-bold">₩{yearlyPrice.toLocaleString()}</div>
+                  <div className="text-2xl font-bold">
+                    {PaymentService.formatPrice(yearlyPrice)}
+                  </div>
                   <div className="text-sm text-gray-500">/ 년</div>
                 </div>
               </div>
@@ -176,7 +213,7 @@ const PaymentModal = ({ open, onOpenChange, plan = 'basic' }) => {
 
           {/* 결제 정보 */}
           <div className="space-y-3">
-            <h3 className="font-semibold text-lg">결제 정보</h3>
+            <h3 className="font-semibold text-lg">결제 요약</h3>
             <div className="bg-gray-50 rounded-lg p-4 space-y-2">
               <div className="flex justify-between">
                 <span>플랜</span>
@@ -189,12 +226,14 @@ const PaymentModal = ({ open, onOpenChange, plan = 'basic' }) => {
               <div className="flex justify-between font-semibold text-lg">
                 <span>총 결제 금액</span>
                 <span>
-                  ₩{(selectedBilling === 'monthly' ? monthlyPrice : yearlyPrice).toLocaleString()}
+                  {PaymentService.formatPrice(
+                    selectedBilling === 'monthly' ? monthlyPrice : yearlyPrice
+                  )}
                 </span>
               </div>
               {selectedBilling === 'yearly' && (
                 <div className="text-sm text-green-600 text-center">
-                  월간 대비 ₩{yearlySavings.toLocaleString()} 절약!
+                  월간 결제 대비 {PaymentService.formatPrice(yearlySavings)} 절약!
                 </div>
               )}
             </div>
@@ -210,20 +249,22 @@ const PaymentModal = ({ open, onOpenChange, plan = 'basic' }) => {
             {isProcessing ? (
               <>
                 <Loader2 className="h-5 w-5 animate-spin mr-2" />
-                결제 처리 중...
+                처리 중...
               </>
             ) : (
               <>
                 <CreditCard className="h-5 w-5 mr-2" />
-                ₩{(selectedBilling === 'monthly' ? monthlyPrice : yearlyPrice).toLocaleString()} 결제하기
+                {PaymentService.formatPrice(
+                  selectedBilling === 'monthly' ? monthlyPrice : yearlyPrice
+                )} 결제하기
               </>
             )}
           </Button>
 
           {/* 안내사항 */}
           <div className="text-xs text-gray-500 space-y-1">
-            <p>• 결제는 토스페이먼츠를 통해 안전하게 처리됩니다.</p>
-            <p>• 구독은 언제든지 취소할 수 있으며, 현재 기간이 끝날 때까지 서비스를 이용할 수 있습니다.</p>
+            <p>• 토스페이먼츠를 통해 안전하게 결제됩니다.</p>
+            <p>• 언제든지 취소할 수 있으며, 결제 기간 종료까지 서비스를 이용하실 수 있습니다.</p>
             <p>• 환불 정책은 이용약관을 참고해주세요.</p>
           </div>
         </div>

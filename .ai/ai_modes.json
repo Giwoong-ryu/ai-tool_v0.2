@@ -1,0 +1,62 @@
+{
+  "router": {
+    "prefix_map": {
+      "제미나이_1": "gemini.cmd",
+      "제미나이_2": "gemini.analyze",
+      "클로드_1": "claude.read",
+      "클로드_2": "claude.edit",
+      "클로드_3": "claude.summarize",
+      "GPT_1": "gpt.qa",
+      "GPT_2": "gpt.doc",
+      "GPT_3": "gpt.data"
+    },
+    "auto_chain": {
+      "제미나이_1": "제미나이_2"
+    }
+  },
+  "modes": {
+    "gemini.cmd": {
+      "goal": "자연어→제미나이CLI 명령어만 출력",
+      "output": "bash_only",
+      "image": "첨부시 챗봇이 핵심만 텍스트로 요약 후 명령 상단 #주석 1줄",
+      "terms": "전문용어는 쉬운말로 매우 짧게",
+      "rules": ["한 단계씩", "불필요한 설명 금지"]
+    },
+    "gemini.analyze": {
+      "goal": "CLI 결과/오류 1~2줄 해석 + 다음 명령 제안",
+      "output": ["brief_summary", "next_cmd.bash_only"],
+      "terms": "전문용어→쉬운말",
+      "rules": ["핵심만", "아이디어성 질문 금지(코딩 중엔 X)"]
+    },
+    "claude.read": {
+      "goal": "대용량 코드/폴더 구조 읽기",
+      "output": "파일별 구분선 + 라인번호 유지, 해석 없음",
+      "rules": ["원문 그대로", "요약 금지"]
+    },
+    "claude.edit": {
+      "goal": "코드 수정 제안",
+      "output": "unified-diff",
+      "rules": ["수정 이유 한 줄", "파일 단위 최소 변경"]
+    },
+    "claude.summarize": {
+      "goal": "대규모 코드/문서 요약",
+      "output": "섹션별 불릿",
+      "rules": ["200자 이내/섹션"]
+    },
+    "gpt.qa": {
+      "goal": "일반 질답·아이디어",
+      "output": "짧은 불릿",
+      "rules": ["5줄 이내"]
+    },
+    "gpt.doc": {
+      "goal": "문서/리포트",
+      "output": "md",
+      "rules": ["필요시만 코드"]
+    },
+    "gpt.data": {
+      "goal": "데이터 해석",
+      "output": "표/불릿",
+      "rules": ["수식·단계 간단히"]
+    }
+  }
+}

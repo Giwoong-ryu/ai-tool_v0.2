@@ -4,10 +4,267 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>이지픽</title>
+    
+    <!-- SEO 및 메타 태그 -->
+    <title>이지픽 - AI 도구 선택 라이브러리 | 맞춤형 AI 도구 추천 서비스</title>
+    <meta name="description" content="나에게 딱 맞는 AI 도구를 찾고 계신가요? ChatGPT, Claude, Midjourney 등 200+ AI 도구 중에서 최적의 선택을 도와드립니다. 무료 AI 도구 추천, 비교 분석, 사용 가이드 제공." />
+    <meta name="keywords" content="AI 도구, 인공지능, ChatGPT, Midjourney, Claude, 맞춤형 추천, AI 도구 비교, 무료 AI 도구, AI 도구 가이드, 생산성 도구, AI 서비스, 이지픽" />
+    <meta name="author" content="이지픽" />
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+    <meta name="googlebot" content="index, follow" />
+    <meta name="language" content="ko-KR" />
+    <meta name="geo.region" content="KR" />
+    <meta name="geo.country" content="South Korea" />
+    <link rel="canonical" href="https://easypick.ai/" />
+    
+    <!-- Open Graph 태그 -->
+    <meta property="og:title" content="이지픽 - AI 도구 선택 라이브러리 | 맞춤형 AI 도구 추천 서비스" />
+    <meta property="og:description" content="ChatGPT, Claude, Midjourney 등 200+ AI 도구 중에서 최적의 선택을 도와드립니다. 무료 AI 도구 추천, 비교 분석, 사용 가이드 제공." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://easypick.ai/" />
+    <meta property="og:image" content="https://easypick.ai/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="이지픽 - AI 도구 선택 라이브러리" />
+    <meta property="og:site_name" content="이지픽" />
+    <meta property="og:locale" content="ko_KR" />
+    
+    <!-- Twitter Card 태그 -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@easypick_ai" />
+    <meta name="twitter:creator" content="@easypick_ai" />
+    <meta name="twitter:title" content="이지픽 - AI 도구 선택 라이브러리 | 맞춤형 AI 도구 추천 서비스" />
+    <meta name="twitter:description" content="ChatGPT, Claude, Midjourney 등 200+ AI 도구 중에서 최적의 선택을 도와드립니다. 무료 AI 도구 추천, 비교 분석, 사용 가이드 제공." />
+    <meta name="twitter:image" content="https://easypick.ai/twitter-image.png" />
+    <meta name="twitter:image:alt" content="이지픽 - AI 도구 선택 라이브러리" />
+    
+    <!-- DNS prefetch and preconnect for performance -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Preload critical resources -->
+    <link rel="modulepreload" href="/src/main.jsx">
+    <link rel="modulepreload" href="/src/app.jsx">
+    
+    <!-- Preload critical images -->
+    <link rel="preload" as="image" href="/favicon.png" type="image/png">
+    
+    <!-- Early resource hints -->
+    <link rel="dns-prefetch" href="https://api.supabase.co">
+    <link rel="dns-prefetch" href="https://fonts.bunny.net">
+    
+    <!-- 폰트 preload for performance - Critical fonts first -->
+    <link rel="preload" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/PretendardVariable.woff2" as="font" type="font/woff2" crossorigin>
+    
+    <!-- Critical CSS and font loading optimization -->
+    <style>
+      @font-face {
+        font-family: 'Pretendard Variable';
+        font-weight: 45 920;
+        font-style: normal;
+        font-display: swap;
+        src: url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/PretendardVariable.woff2') format('woff2-variations');
+      }
+      
+      /* Critical above-the-fold styles */
+      html, body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Pretendard Variable', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+        font-size-adjust: 0.5;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        background-color: #fafafa;
+        color: #111827;
+      }
+      
+      /* Critical layout styles - prevent CLS */
+      #root {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      
+      /* Loading skeleton to prevent layout shift */
+      .loading-skeleton {
+        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        background-size: 200% 100%;
+        animation: skeleton-loading 1.5s infinite;
+      }
+      
+      @keyframes skeleton-loading {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+      }
+      
+      /* Critical header styles */
+      .hero-section {
+        padding: 3rem 1rem;
+        text-align: center;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+      }
+      
+      .hero-title {
+        font-size: clamp(2rem, 4vw, 3.5rem);
+        font-weight: 700;
+        line-height: 1.1;
+        margin: 0 0 1rem 0;
+      }
+      
+      .hero-subtitle {
+        font-size: clamp(1rem, 2vw, 1.25rem);
+        opacity: 0.9;
+        margin: 0 0 2rem 0;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      
+      /* Grid layout optimization */
+      .tools-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+        padding: 2rem 1rem;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      
+      /* Card styles to prevent layout shift */
+      .tool-card {
+        background: white;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        height: fit-content;
+        min-height: 200px;
+      }
+      
+      .tool-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+      
+      /* Performance optimizations */
+      img {
+        max-width: 100%;
+        height: auto;
+        loading: lazy;
+        decoding: async;
+      }
+      
+      /* Reduce paint complexity */
+      * {
+        box-sizing: border-box;
+      }
+      
+      /* GPU acceleration for transforms */
+      .tool-card, .loading-skeleton {
+        will-change: transform;
+        transform: translateZ(0);
+      }
+    </style>
+    
+    <!-- 테마 컨러 -->
+    <meta name="theme-color" content="#2563EB" />
+    <meta name="msapplication-TileColor" content="#2563EB" />
+    
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+    
+    <!-- Apple touch icons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    
+    <!-- Security headers -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; worker-src blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; font-src 'self' https: data:; connect-src 'self' https:; frame-src 'self' https:;" />
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+    <meta http-equiv="X-Frame-Options" content="DENY" />
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
+    
+    <!-- JSON-LD structured data for SEO -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "이지픽 - AI 도구 선택 라이브러리",
+      "description": "ChatGPT, Claude, Midjourney 등 200+ AI 도구 중에서 최적의 선택을 도와드립니다.",
+      "url": "https://easypick.ai",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "KRW"
+      },
+      "author": {
+        "@type": "Organization",
+        "name": "이지픽"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "이지픽",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://easypick.ai/favicon.png"
+        }
+      }
+    }
+    </script>
   </head>
   <body>
-    <div id="root"></div>
+    <!-- Initial loading screen to prevent flash -->
+    <div id="root">
+      <div class="hero-section">
+        <div class="loading-skeleton" style="width: 300px; height: 60px; margin: 0 auto 20px;"></div>
+        <div class="loading-skeleton" style="width: 500px; height: 20px; margin: 0 auto;"></div>
+      </div>
+    </div>
+    
+    <!-- Non-blocking performance monitoring -->
+    <script>
+      // Performance observer for monitoring LCP, FID, CLS
+      if ('PerformanceObserver' in window) {
+        const observer = new PerformanceObserver((list) => {
+          for (const entry of list.getEntries()) {
+            if (entry.entryType === 'largest-contentful-paint') {
+              console.log('LCP:', entry.startTime);
+            }
+            if (entry.entryType === 'first-input') {
+              console.log('FID:', entry.processingStart - entry.startTime);
+            }
+            if (entry.entryType === 'layout-shift' && !entry.hadRecentInput) {
+              console.log('CLS:', entry.value);
+            }
+          }
+        });
+        
+        try {
+          observer.observe({type: 'largest-contentful-paint', buffered: true});
+          observer.observe({type: 'first-input', buffered: true});
+          observer.observe({type: 'layout-shift', buffered: true});
+        } catch (e) {
+          // Fallback for browsers that don't support all entry types
+          console.log('Performance observer not fully supported');
+        }
+      }
+      
+      // Critical resource loading optimization
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then(reg => console.log('SW registered'))
+            .catch(err => console.log('SW registration failed'));
+        });
+      }
+    </script>
+    
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

@@ -1,14 +1,9 @@
-// 소셜 로그인 설정
+// 소셜 로그인 설정 (Google, Kakao만)
 export const socialAuthConfig = {
   google: {
     clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID || 'YOUR_GOOGLE_CLIENT_ID',
     redirectUri: window.location.origin + '/auth/google/callback',
     scope: 'email profile'
-  },
-  naver: {
-    clientId: import.meta.env.VITE_NAVER_CLIENT_ID || 'YOUR_NAVER_CLIENT_ID',
-    redirectUri: window.location.origin + '/auth/naver/callback',
-    state: Math.random().toString(36).substring(7)
   },
   kakao: {
     clientId: import.meta.env.VITE_KAKAO_CLIENT_ID || 'YOUR_KAKAO_CLIENT_ID',
@@ -25,13 +20,6 @@ export const getSocialLoginUrl = (provider) => {
         `&redirect_uri=${encodeURIComponent(socialAuthConfig.google.redirectUri)}` +
         `&response_type=code` +
         `&scope=${encodeURIComponent(socialAuthConfig.google.scope)}`
-      
-    case 'naver':
-      return `https://nid.naver.com/oauth2.0/authorize?` +
-        `client_id=${socialAuthConfig.naver.clientId}` +
-        `&redirect_uri=${encodeURIComponent(socialAuthConfig.naver.redirectUri)}` +
-        `&response_type=code` +
-        `&state=${socialAuthConfig.naver.state}`
       
     case 'kakao':
       return `https://kauth.kakao.com/oauth/authorize?` +

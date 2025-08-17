@@ -1,0 +1,455 @@
+추가 프롬프트 20개 (실제 적용필요)
+1) 카페 월별 매출 대시보드 자동화
+Launcher 템플릿(JSON)
+
+json
+복사
+편집
+{
+  "id": "cafe-sales-monthly",
+  "category": "대시보드/매출",
+  "title": "카페 월별 매출 대시보드",
+  "icon": "☕",
+  "fields": [
+    { "id": "period", "options": ["이번 달(기본)", "최근 3개월", "올해 전체"] },
+    { "id": "output", "options": ["표+차트(기본)", "표만", "차트만"] },
+    { "id": "impl", "options": ["엑셀 수식/피벗(기본)", "Power Query"] },
+    { "id": "extra", "options": ["간단(기본)", "엣지/대체안/체크리스트 포함"] }
+  ],
+  "defaults": { "period": "이번 달(기본)", "output": "표+차트(기본)", "impl": "엑셀 수식/피벗(기본)", "extra": "간단(기본)" }
+}
+모델 프롬프트 골격
+
+scss
+복사
+편집
+목표: POS 매출 CSV 기반으로 {period} 지표를 {output}로 보여주는 대시보드.
+환경: Excel 365/Windows, 구현: {impl}
+
+[필수]
+1) 요약(3문장)  2) 준비물(컬럼 정의+샘플5행)  3) 절차(한국어 UI 경로/이유)
+4) 핵심 구현(복붙 즉시: 수식·피벗·PQ 단계)  5) 검증(작은 케이스+기대표)
+
+[선택 — {extra}가 '엣지...'일 때만]
+- 오류·엣지(누락값/중복지점)  - 대체안 비교(수식 vs PQ)  - 다음 행동 체크리스트(5)
+2) 인사 데이터 이직률 대시보드
+json
+복사
+편집
+{
+  "id": "hr-attrition-dashboard",
+  "category": "대시보드/HR",
+  "title": "이직률 대시보드",
+  "icon": "👥",
+  "fields": [
+    { "id": "period", "options": ["최근 1년(기본)", "최근 6개월", "올해 전체"] },
+    { "id": "granularity", "options": ["전체(기본)", "부서별", "직급별"] },
+    { "id": "output", "options": ["요약+차트(기본)", "요약만"] },
+    { "id": "extra", "options": ["간단(기본)", "엣지/대체안/체크리스트 포함"] }
+  ],
+  "defaults": { "period": "최근 1년(기본)", "granularity": "전체(기본)", "output": "요약+차트(기본)", "extra": "간단(기본)" }
+}
+css
+복사
+편집
+역할: 인력 분석 매니저. 목표: {period} 이직률 대시보드, 세분화: {granularity}, 출력: {output}
+필수: 요약/준비물/절차/핵심 구현(지표 정의: 입·퇴사수, 이직률)/검증
+선택({extra}가 확장일 때): 엣지(휴직/재입사 처리)/대체안/체크리스트
+3) 재고 현황·재주문 알림
+json
+복사
+편집
+{
+  "id": "inventory-reorder",
+  "category": "재고/물류",
+  "title": "재고 대시보드+재주문 알림",
+  "icon": "📦",
+  "fields": [
+    { "id": "threshold", "options": ["10 미만(기본)", "5 미만", "20 미만"] },
+    { "id": "focus", "options": ["전체(기본)", "특정 카테고리", "공급사"] },
+    { "id": "notify", "options": ["리스트(기본)", "색상 표시", "요약 통계"] },
+    { "id": "extra", "options": ["간단(기본)", "엣지/체크리스트"] }
+  ],
+  "defaults": { "threshold": "10 미만(기본)", "focus": "전체(기본)", "notify": "리스트(기본)", "extra": "간단(기본)" }
+}
+makefile
+복사
+편집
+목표: 임계치 {threshold}, 대상 {focus}. 결과: {notify}.
+필수: 요약/준비물(품목ID, 수량, 임계치)/절차/핵심(조건부서식·피벗)/검증
+선택: 엣지(안전재고/리드타임)/체크리스트
+4) 예산 대비 실적
+json
+복사
+편집
+{
+  "id": "budget-vs-actual",
+  "category": "재무/보고",
+  "title": "예산 vs 실적 대시보드",
+  "icon": "📈",
+  "fields": [
+    { "id": "period", "options": ["올해(기본)", "전년 포함", "사용자 지정"] },
+    { "id": "view", "options": ["요약+차트(기본)", "부서별 상세 포함"] },
+    { "id": "impl", "options": ["피벗(기본)", "Power Query"] },
+    { "id": "extra", "options": ["간단(기본)", "엣지/대체안"] }
+  ],
+  "defaults": { "period": "올해(기본)", "view": "요약+차트(기본)", "impl": "피벗(기본)", "extra": "간단(기본)" }
+}
+css
+복사
+편집
+목표: {period} 예산·실적 비교, 보기: {view}, 구현: {impl}
+필수: 요약/준비물(월, 계정, 예산, 실적)/절차/핵심(변동·달성률 계산)/검증
+선택: 엣지(누락월, 음수)/대체안
+5) 마케팅 캠페인 성과
+json
+복사
+편집
+{
+  "id": "mkt-campaign-performance",
+  "category": "마케팅/성과",
+  "title": "캠페인 성과 대시보드",
+  "icon": "📣",
+  "fields": [
+    { "id": "period", "options": ["최근 3개월(기본)", "최근 6개월", "올해 전체"] },
+    { "id": "kpi", "options": ["전환율(기본)", "클릭수", "ROI"] },
+    { "id": "output", "options": ["요약+차트(기본)", "표만"] },
+    { "id": "extra", "options": ["간단(기본)", "엣지/대체안"] }
+  ],
+  "defaults": { "period": "최근 3개월(기본)", "kpi": "전환율(기본)", "output": "요약+차트(기본)", "extra": "간단(기본)" }
+}
+makefile
+복사
+편집
+목표: {period} {kpi} 중심 대시보드, 출력: {output}
+필수: 요약/준비물(캠페인ID, 노출, 클릭, 전환)/절차/핵심(지표 계산식)/검증
+선택: 엣지(UTM 누락, 중복 캠페인)/대체안
+6) 소셜 미디어 지표 추적
+json
+복사
+편집
+{
+  "id": "social-metrics-tracker",
+  "category": "마케팅/SNS",
+  "title": "SNS 팔로워·참여율 추적",
+  "icon": "📱",
+  "fields": [
+    { "id": "platforms", "options": ["FB+IG(기본)", "FB만", "IG만"] },
+    { "id": "metrics", "options": ["팔로워+참여율(기본)", "팔로워", "참여율"] },
+    { "id": "output", "options": ["요약+차트(기본)", "표만"] }
+  ],
+  "defaults": { "platforms": "FB+IG(기본)", "metrics": "팔로워+참여율(기본)", "output": "요약+차트(기본)" }
+}
+makefile
+복사
+편집
+목표: {platforms} {metrics} 추이 대시보드({output})
+필수: 요약/준비물(월, 플랫폼, 값)/절차/핵심(증감, 이동평균)/검증
+7) 프로젝트 Gantt 자동 생성
+json
+복사
+편집
+{
+  "id": "gantt-auto",
+  "category": "프로젝트/PM",
+  "title": "Gantt 차트 자동 생성",
+  "icon": "🗓️",
+  "fields": [
+    { "id": "scope", "options": ["단일 프로젝트(기본)", "여러 프로젝트"] },
+    { "id": "output", "options": ["차트(기본)", "일정 표", "캘린더"] },
+    { "id": "impl", "options": ["조건부서식(기본)", "Power Query"] }
+  ],
+  "defaults": { "scope": "단일 프로젝트(기본)", "output": "차트(기본)", "impl": "조건부서식(기본)" }
+}
+makefile
+복사
+편집
+목표: {scope} 입력으로 {output} Gantt 생성(구현 {impl})
+필수: 요약/준비물(작업명, 시작/종료일)/절차/핵심(막대 그리기 규칙)/검증
+8) 매출 예측 시뮬레이션
+json
+복사
+편집
+{
+  "id": "sales-forecast-excel",
+  "category": "예측/시뮬레이션",
+  "title": "3~12개월 매출 예측",
+  "icon": "🔮",
+  "fields": [
+    { "id": "horizon", "options": ["3개월(기본)", "6개월", "12개월"] },
+    { "id": "unit", "options": ["월별(기본)", "분기별", "연간"] },
+    { "id": "impl", "options": ["단순 이동평균(기본)", "지수평활", "선형회귀"] }
+  ],
+  "defaults": { "horizon": "3개월(기본)", "unit": "월별(기본)", "impl": "단순 이동평균(기본)" }
+}
+makefile
+복사
+편집
+목표: 과거 데이터로 {horizon} {unit} 예측(방법 {impl})
+필수: 요약/준비물/절차/핵심(공식·수식)/검증(작은 케이스)
+9) 지점별 매출 파일 통합
+json
+복사
+편집
+{
+  "id": "branch-sales-merge",
+  "category": "통합/ETL",
+  "title": "지점 매출 CSV 통합 리포트",
+  "icon": "🧩",
+  "fields": [
+    { "id": "file_count", "options": ["≤5(기본)", "~10", "10+"] },
+    { "id": "report", "options": ["통합 상세(기본)", "요약 집계", "피벗 대시보드"] },
+    { "id": "impl", "options": ["Power Query(기본)", "수식"] }
+  ],
+  "defaults": { "file_count": "≤5(기본)", "report": "통합 상세(기본)", "impl": "Power Query(기본)" }
+}
+makefile
+복사
+편집
+목표: {file_count} 파일을 {impl}로 통합 → {report}
+필수: 요약/준비물(파일 패턴)/절차/핵심(쿼리 단계)/검증
+10) 고객 세분화 & Top N
+json
+복사
+편집
+{
+  "id": "customer-seg-topn",
+  "category": "분석/CRM",
+  "title": "고객 세분화 + 상위 N",
+  "icon": "👑",
+  "fields": [
+    { "id": "seg_key", "options": ["총매출(기본)", "거래빈도", "지역"] },
+    { "id": "topn", "options": ["Top10(기본)", "Top20", "Top5"] },
+    { "id": "impl", "options": ["피벗/정렬(기본)", "Power Query"] }
+  ],
+  "defaults": { "seg_key": "총매출(기본)", "topn": "Top10(기본)", "impl": "피벗/정렬(기본)" }
+}
+makefile
+복사
+편집
+목표: {seg_key} 기준 세분화 + {topn} 리스트(구현 {impl})
+필수: 요약/준비물/절차/핵심(정렬·랭크)/검증
+11) 제조 불량률 추적
+json
+복사
+편집
+{
+  "id": "mfg-defect-rate",
+  "category": "제조/품질",
+  "title": "불량률 대시보드",
+  "icon": "🏭",
+  "fields": [
+    { "id": "period", "options": ["최근 30일(기본)", "최근 90일", "올해"] },
+    { "id": "display", "options": ["% (기본)", "개수/생산량 병기", "추세 강조"] },
+    { "id": "view", "options": ["라인별(기본)", "일자별", "라인+일자"] }
+  ],
+  "defaults": { "period": "최근 30일(기본)", "display": "% (기본)", "view": "라인별(기본)" }
+}
+css
+복사
+편집
+목표: {period} {view} 불량률({display}) 시각화
+필수: 요약/준비물/절차/핵심(불량률 계산)/검증
+12) 고객 지원 티켓 현황
+json
+복사
+편집
+{
+  "id": "support-tickets-dashboard",
+  "category": "CS/운영",
+  "title": "티켓 처리·SLA 대시보드",
+  "icon": "🎫",
+  "fields": [
+    { "id": "period", "options": ["최근 1개월(기본)", "최근 3개월", "올해"] },
+    { "id": "focus", "options": ["평균 처리시간(기본)", "미해결 수", "재발생 수"] },
+    { "id": "output", "options": ["요약+차트(기본)", "표만"] }
+  ],
+  "defaults": { "period": "최근 1개월(기본)", "focus": "평균 처리시간(기본)", "output": "요약+차트(기본)" }
+}
+makefile
+복사
+편집
+목표: {period} {focus} 중심 현황({output})
+필수: 요약/준비물(티켓ID, 접수/해결)/절차/핵심(SLA 계산)/검증
+13) 설문조사 결과 자동 리포트(Google Sheets)
+json
+복사
+편집
+{
+  "id": "survey-summary-gsheets",
+  "category": "리포트/설문",
+  "title": "설문 결과 요약·시각화",
+  "icon": "📝",
+  "fields": [
+    { "id": "scope", "options": ["전체 문항(기본)", "특정 문항 심층"] },
+    { "id": "output", "options": ["차트+통계(기본)", "통계만", "원시 데이터 포함"] }
+  ],
+  "defaults": { "scope": "전체 문항(기본)", "output": "차트+통계(기본)" }
+}
+makefile
+복사
+편집
+환경: Google Sheets/Chrome
+목표: {scope} 결과를 {output}로 생성
+필수: 요약/준비물(응답 시트 스키마)/절차/핵심(함수·차트)/검증
+14) 엑셀 보고서 자동 이메일(VBA)
+json
+복사
+편집
+{
+  "id": "excel-email-vba",
+  "category": "자동화/메일",
+  "title": "보고서 자동 메일 발송",
+  "icon": "✉️",
+  "fields": [
+    { "id": "freq", "options": ["매일(기본)", "매주", "매월"] },
+    { "id": "format", "options": ["엑셀 첨부(기본)", "PDF 첨부", "본문 표"] },
+    { "id": "client", "options": ["Outlook(기본)", "기타"] }
+  ],
+  "defaults": { "freq": "매일(기본)", "format": "엑셀 첨부(기본)", "client": "Outlook(기본)" }
+}
+makefile
+복사
+편집
+목표: {freq} {format}로 자동 발송(클라이언트 {client})
+필수: 요약/준비물/절차/핵심(VBA 코드)/검증(더미 메일함)
+15) 외부 API → 엑셀 수집
+json
+복사
+편집
+{
+  "id": "excel-api-pull",
+  "category": "데이터수집/API",
+  "title": "외부 API 수집·갱신",
+  "icon": "🔗",
+  "fields": [
+    { "id": "datatype", "options": ["주가(기본)", "환율", "날씨"] },
+    { "id": "engine", "options": ["Office Scripts(기본)", "VBA"] },
+    { "id": "freq", "options": ["수동(기본)", "매시간", "매일"] }
+  ],
+  "defaults": { "datatype": "주가(기본)", "engine": "Office Scripts(기본)", "freq": "수동(기본)" }
+}
+makefile
+복사
+편집
+목표: {datatype} API를 {engine}로 수집/갱신({freq})
+필수: 요약/준비물(엔드포인트·키)/절차/핵심(스크립트)/검증
+16) 대용량 정제·중복 제거
+json
+복사
+편집
+{
+  "id": "data-clean-dedupe",
+  "category": "정제/품질",
+  "title": "대용량 정제·중복 제거",
+  "icon": "🧹",
+  "fields": [
+    { "id": "tasks", "options": ["중복+누락(기본)", "중복만", "형식 통일"] },
+    { "id": "output", "options": ["원본 덮어쓰기(기본)", "별도 시트", "요약 리포트"] }
+  ],
+  "defaults": { "tasks": "중복+누락(기본)", "output": "원본 덮어쓰기(기본)" }
+}
+makefile
+복사
+편집
+목표: {tasks} 수행 후 {output} 생성
+필수: 요약/준비물/절차/핵심(정제 규칙·수식)/검증(샘플)
+17) 피벗으로 판매 요약
+json
+복사
+편집
+{
+  "id": "pivot-sales-summary",
+  "category": "요약/피벗",
+  "title": "피벗 판매 요약",
+  "icon": "📊",
+  "fields": [
+    { "id": "basis", "options": ["지역+제품(기본)", "지역", "제품"] },
+    { "id": "period", "options": ["월별(기본)", "분기별", "연도별"] }
+  ],
+  "defaults": { "basis": "지역+제품(기본)", "period": "월별(기본)" }
+}
+``]
+목표: {basis} 기준 {period} 요약 피벗
+필수: 요약/준비물/절차/핵심(피벗 필드 설정)/검증
+
+pgsql
+복사
+편집
+
+---
+
+### 18) 근태 기록·초과근무 계산
+```json
+{
+  "id": "attendance-overtime",
+  "category": "HR/근태",
+  "title": "월별 근무·초과근무 계산",
+  "icon": "⏱️",
+  "fields": [
+    { "id": "period", "options": ["최근 1개월(기본)", "최근 3개월", "올해"] },
+    { "id": "rule", "options": ["주40h(기본)", "월209h", "사용자 정의"] },
+    { "id": "output", "options": ["요약+표(기본)", "표만"] }
+  ],
+  "defaults": { "period": "최근 1개월(기본)", "rule": "주40h(기본)", "output": "요약+표(기본)" }
+}
+makefile
+복사
+편집
+목표: {period} 근무시간 계산, 기준 {rule}, 출력 {output}
+필수: 요약/준비물(출·퇴근 시각)/절차/핵심(시간 차·야간 처리)/검증
+19) 대출 상환 일정표(엑셀 금융함수)
+json
+복사
+편집
+{
+  "id": "loan-amort-excel",
+  "category": "금융/대출",
+  "title": "상환 일정표 자동 계산",
+  "icon": "💸",
+  "fields": [
+    { "id": "method", "options": ["원리금 균등(기본)", "원금 균등", "만기 일시"] },
+    { "id": "output", "options": ["월별+요약(기본)", "월별만", "요약만"] }
+  ],
+  "defaults": { "method": "원리금 균등(기본)", "output": "월별+요약(기본)" }
+}
+swift
+복사
+편집
+역할: 개인금융 담당자. 목표: {method} 기준 {output}.
+필수: 요약/준비물(원금, 연이율, 기간)/절차/핵심(복붙 수식: PMT/IPMT/PPMT)/검증(샘플)
+힌트: Excel PMT/IPMT/PPMT로 원리금·이자·원금 분해. :contentReference[oaicite:1]{index=1}
+20) 두 목록 비교(변동 내역)
+json
+복사
+편집
+{
+  "id": "list-diff-checker",
+  "category": "비교/검증",
+  "title": "재고 목록 변동 확인",
+  "icon": "🔍",
+  "fields": [
+    { "id": "result", "options": ["신규+소진(기본)", "신규만", "소진만"] },
+    { "id": "display", "options": ["리스트(기본)", "원본 색상 표시", "요약 통계"] }
+  ],
+  "defaults": { "result": "신규+소진(기본)", "display": "리스트(기본)" }
+}
+css
+복사
+편집
+목표: 이전월 vs 현재월 비교 → {result}를 {display}로 출력
+필수: 요약/준비물(품목ID 두 목록)/절차/핵심(집합 차집합·VLOOKUP/XLOOKUP)/검증
+공통 “모델 프롬프트” 작성 규칙(짧고 강력하게)
+역할+목표를 1~2줄로 먼저 명시 → 바로 필수 섹션 5개(요약/준비물/절차/핵심/검증).
+
+확장 항목은 옵션 토글(extra, include_edges)이 “확장일 때만” 포함.
+
+구분자/레이블(예: [필수], ---)로 섹션 경계 선명하게.
+
+불확실 시 1~2개 객관식만 재질문(“보편값(기본)” 포함).
+→ 이 구조는 “명확·구조화·간결” 원칙과 부합하며, 최신 가이드의 권고도 동일해. 
+OpenAI Help Center
+Microsoft Learn
+OpenAI Cookbook
+Anthropic
+

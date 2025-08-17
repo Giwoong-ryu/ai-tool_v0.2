@@ -1,0 +1,139 @@
+
+✦ 사용자께서 제가 수행한 변경 사항에 대한 보고서를 요청하셨습니다. 이번 상호작용 동안 수행한 모든 수정을 요약하여 보고서를 작성해야 합니다.
+
+  보고서에 포함될 섹션은 다음과 같습니다.
+
+   1. 초기 요청 이해: 사용자의 초기 목표(내비게이션 통일, 색상 수정, 모달 복원)를 간략하게 설명합니다.
+   2. 내비게이션 바 리팩토링:
+       * NavigationBar.jsx 생성.
+       * EasyPickHero.jsx를 NavigationBar를 사용하도록 수정.
+       * NewMainLanding.jsx를 NavigationBar를 사용하도록 수정.
+       * app.jsx(AppLayout)를 NavigationBar를 사용하도록 수정.
+       * NavigationBar의 배경색 수정.
+   3. 랜딩 페이지 블록 구조 (`NewMainLanding.jsx`):
+       * 섹션별 배경색 교차 적용.
+       * 카드 배경색을 회색으로 변경.
+   4. AI 도구 그리드 (`AIToolsGrid.jsx`) 개선:
+       * 도구 상세 모달 기능 복원.
+           * 상태 변수(showToolModal, selectedTool) 추가.
+           * openToolModal 및 closeModal 함수 추가.
+           * Card 컴포넌트에 onClick 핸들러 추가.
+           * 모달 표시를 위한 Dialog 컴포넌트 추가.
+           * 헬퍼 함수(renderStars, isStrongPointFeature) 추가.
+       * 정렬 버튼 재구현.
+       * 모달 크기 조정(max-w, max-h).
+       * 헤더 제목 및 설명 업데이트.
+       * aiTools 정의되지 않음 오류 수정.
+       * Star is not defined 오류 수정.
+   5. 검색 기능 리팩토링 (`aiToolsService.js`):
+       * textSearch 사용 제거.
+       * SYN (동의어 사전) 및 expandQuery 유틸리티 추가.
+       * searchTools를 ilike 및 .or() 기반 구현으로 교체.
+       * searchTools 함수 위치 수정 (클래스 외부).
+   6. 오류 처리 및 디버깅: 발생한 오류 및 해결 방법 언급 (예: Unterminated string constant, ReferenceError).
+
+  지금부터 보고서를 작성하겠습니다.
+  작업 보고서: 이지픽 웹사이트 기능 개선 및 버그 수정
+
+  안녕하세요. 요청하신 이지픽 웹사이트의 기능 개선 및 버그 수정 작업에 대한 보고서입니다. 이번 작업을 통해 내비게이션 바 통일, 랜딩 페이지 UI
+  개선, AI 도구 상세 모달 복원, 검색 기능 리팩토링 등 다양한 부분을 수정했습니다.
+
+  ---
+
+  1. 내비게이션 바 통일 및 색상 일관성 확보
+
+  목표: 히어로 섹션과 다른 페이지의 내비게이션 바를 통일하고, 색상 및 레이아웃 일관성을 확보합니다.
+
+  수정 내용:
+   * `NavigationBar.jsx` 컴포넌트 생성: 기존 EasyPickHero.jsx에 있던 내비게이션 바 코드를 src/components/NavigationBar.jsx 파일로 분리하여
+     재사용 가능한 컴포넌트로 만들었습니다.
+   * 컴포넌트 재사용:
+       * src/components/EasyPickHero.jsx에서 기존 내비게이션 코드를 제거하고 새로 생성한 NavigationBar 컴포넌트를 사용하도록 수정했습니다.
+       * src/components/NewMainLanding.jsx에서도 NavigationBar 컴포넌트를 추가하여 사용하도록 수정했습니다.
+       * src/app.jsx의 AppLayout 컴포넌트 내부에 있던 기존 헤더를 제거하고 NavigationBar 컴포넌트를 삽입하여, /tools, /prompts, /workflows 등
+         모든 페이지에서 동일한 내비게이션 바를 사용하도록 통일했습니다.
+   * 색상 일관성 확보: 내비게이션 바의 배경색을 bg-white/90에서 bg-slate-50/90으로 변경하여 히어로 섹션과 다른 페이지에서 일관된 회색 배경을
+     가지도록 했습니다.
+
+  해결된 문제:
+   * 내비게이션 바의 레이아웃 및 색상이 페이지마다 다르게 표시되던 문제.
+
+  ---
+
+  2. 랜딩 페이지 블록 구조 개선 (NewMainLanding.jsx)
+
+  목표: 랜딩 페이지의 블록 구조를 명확하게 구분하고, 기존 색상(흰색, 연회색, 진한 남색)을 유지하면서 시각적 구분을 강화합니다.
+
+  수정 내용:
+   * 섹션 배경색 교차 적용: NewMainLanding.jsx 내의 주요 섹션(Feature Sections, Testimonials, Pricing Section)의 배경색을 흰색(bg-white)과
+     연회색(bg-slate-50)으로 교차 적용하여 각 섹션의 시각적 구분을 명확히 했습니다.
+   * 카드 배경색 통일: NewMainLanding.jsx 내의 카드 컴포넌트(ToolRankingItem, 사용자 후기 카드, 요금제 카드)의 배경색을 bg-white에서
+     bg-slate-100으로 변경하여 일관된 연회색 배경을 가지도록 했습니다.
+
+  ---
+
+  3. AI 도구 모음 페이지 개선 (AIToolsGrid.jsx)
+
+  목표: AI 도구 상세 모달 기능을 복원하고, 헤더 양식을 통일하며, 정렬 기능을 재구현하고, 모달 겹침 문제를 해결합니다.
+
+  수정 내용:
+   * AI 도구 상세 모달 기능 복원:
+       * src/components/AIToolsGrid_backup.jsx 파일에 있던 모달 관련 로직을 src/components/AIToolsGrid.jsx로 다시 가져왔습니다.
+       * showToolModal, selectedTool 상태 변수와 openToolModal, closeModal 함수를 추가했습니다.
+       * 각 도구 카드(Card 컴포넌트)에 onClick 핸들러를 추가하여 클릭 시 상세 모달이 열리도록 했습니다.
+       * 도구 상세 정보를 표시하는 Dialog 컴포넌트와 관련 UI 요소를 추가했습니다.
+       * renderStars 및 isStrongPointFeature와 같은 헬퍼 함수를 복원했습니다.
+   * 헤더 양식 통일:
+       * AIToolsGrid.jsx의 헤더를 PromptLauncher.jsx 및 WorkflowGrid.jsx와 유사한 형태로 변경했습니다.
+       * AI 도구 페이지의 헤더 색상을 연녹색(bg-green-100, text-green-800)으로 설정했습니다.
+       * 헤더의 제목과 설명 문구를 사용자 요청에 따라 다음과 같이 수정했습니다:
+           * "이지픽은" 문구 제거
+           * "당신에게"를 "나에게"로 변경
+           * "수많은 AI 도구 중 나에게 꼭 필요한 것을 찾기 어려웠나요? 이지픽은 하고싶은 작업만 입력하면 자동으로 AI모델을 추천해줍니다."를
+             "한국인이 쓰기 가장 편한걸로 골랐습니다. 하고싶은 작업만 입력하면 자동으로 AI모델을 추천해줍니다."로 변경했습니다.
+   * 정렬 기능 재구현: sortBy 상태 변수를 활용하여 인기순, 평점순, 이름순으로 도구를 정렬할 수 있는 버튼들을 다시 추가했습니다.
+   * 모달 겹침 문제 해결: 도구 상세 모달(DialogContent)의 max-width를 700px에서 600px로, max-height를 90vh에서 80vh로 줄여 내비게이션 바와의
+     겹침 문제를 해결했습니다.
+   * 카드 배경색 통일: AIToolsGrid.jsx 내의 카드 컴포넌트 배경색을 bg-slate-100으로 통일했습니다.
+
+  해결된 문제:
+   * AI 도구 상세 모달이 사라졌던 문제.
+   * 헤더 양식의 불일치 문제.
+   * 정렬 기능이 작동하지 않던 문제.
+   * 모달이 내비게이션 바와 겹치던 문제.
+
+  ---
+
+  4. 검색 기능 리팩토링 (src/services/aiToolsService.js)
+
+  목표: Postgres FTS(Full Text Search) 대신 동의어 질의 확장, ilike, 다중 컬럼 OR 조건을 활용한 검색 방식으로 교체하여 한국어 검색 정확도를
+  높입니다.
+
+  수정 내용:
+   * 기존 `textSearch` 제거: AIToolsService 클래스의 searchTools 메서드에서 기존의 textSearch 기반 검색 로직을 제거했습니다.
+   * 동의어 사전 및 질의 확장 함수 추가:
+       * 간단한 한국어 동의어 사전 SYN 객체를 정의했습니다.
+       * 사용자 질의를 동의어와 함께 확장하는 expandQuery 함수를 추가했습니다.
+   * 새로운 `searchTools` 구현:
+       * searchTools 함수를 AIToolsService 클래스 외부로 이동하여 독립적인 export 함수로 만들었습니다.
+       * expandQuery 함수를 통해 확장된 검색어를 기반으로 name, description, category, subcategory 필드에 대해 ilike 및 .or() 필터를 적용하는
+         새로운 검색 로직을 구현했습니다.
+       * 검색어가 비어있을 경우 기본 목록(최대 50개)을 반환하도록 처리했습니다.
+
+  해결된 문제:
+   * 한국어 검색 시 "보고서"와 "문서 작성"처럼 유사한 의미의 단어를 제대로 인식하지 못하던 문제.
+   * Postgres FTS의 CJK(중국어, 일본어, 한국어) 토크나이저의 한계로 인한 검색 정확도 문제.
+
+  ---
+
+  5. 오류 처리 및 디버깅
+
+  작업 과정에서 발생했던 주요 오류들은 다음과 같으며, 모두 해결했습니다:
+   * `Unterminated string constant` 오류: src/components/NavigationBar.jsx 파일의 Badge 컴포넌트 className 속성에서 잘못된 문자열 리터럴
+     사용으로 발생한 구문 오류를 수정했습니다.
+   * `ReferenceError: aiTools is not defined` 오류: src/components/AIToolsGrid.jsx에서 aiTools 데이터 임포트가 누락되어 발생한 오류를
+     수정했습니다.
+   * `ReferenceError: Star is not defined` 오류: src/components/AIToolsGrid.jsx에서 Lucide.Star 대신 Star를 직접 사용하여 발생한 오류를
+     Lucide.Star로 변경하여 수정했습니다.
+   * `searchTools` 함수 위치 오류: src/services/aiToolsService.js에서 searchTools 함수가 클래스 내부에 잘못 정의되어 발생한 문제를 클래스
+     외부로 이동하여 해결했습니다.

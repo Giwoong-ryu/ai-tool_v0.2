@@ -1,74 +1,158 @@
-# CLAUDE.md
+# CLAUDE.md — EasyPick AI Tools Website
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+## 1. Project Overview
+"이지픽" (EasyPick) is a React-based AI tools platform for Korean users.  
+It showcases and categorizes AI tools, provides prompt generation, workflow guides, and supports monetization via subscription.
 
-## Project Overview
+- **Target Audience**: Korean users, mobile-first design
+- **Core Stack**: React 18, Vite 6, Tailwind CSS 4, Zustand, Supabase, Shadcn/ui, Lucide React, Framer Motion
+- **Routing**: React Router 6 (SPA)
+- **Backend**: Supabase (Postgres DB, Auth, profiles, subscription management)
+- **Deployment**:  
+  - **Current**: GitHub Pages (`gh-pages`, `dist`), Vite `base` = `/ai-tool/`
+  - **Planned**: Vercel migration for monetization & server/webhook features (`base` = `/` or removed)
 
-This is a React-based AI tools website that showcases and categorizes various AI tools for Korean users. The application uses Vite as the build tool and is deployed to GitHub Pages.
+---
 
-## Development Commands
+## 2. Architecture
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build locally
-- `npm run deploy` - Deploy to GitHub Pages (runs build first)
+### Routes
+- `/` — Landing page (NewMainLanding)
+- `/tools` — AI tools discovery/filtering
+- `/prompts` — Prompt generation & templates
+- `/workflows` — Workflow templates & guides
+- `/payment/success` & `/payment/fail` — Payment results
 
-## Architecture & Key Components
+### State Management
+- **Zustand** (`src/store/`):  
+  - `authStore.js` — Authentication, profiles, subscriptions  
+  - `promptStore.js` — Prompt templates & state
+- **React Router State** — Navigation & route state
+- **Local Component State** — Forms, modals, UI interactions
 
-### Main Structure
-- **Entry Point**: `src/main.jsx` renders the root App component
-- **Root Component**: `src/app.jsx` contains the main layout and imports AIToolsGrid
-- **Primary Component**: `src/components/AIToolsGrid.jsx` - The main application component containing all functionality
+### Feature Modules (`src/features/`)
+- `auth/` — Authentication (social login, forms)
+- `payment/` — TossPayments & PayPal integrations
+- `prompt-launcher/` — Prompt generation & model comparisons
+- `workflows/` — Workflow templates & guides
 
-### Data Management
-- **AI Tools Data**: `src/data/aiTools.js` contains comprehensive AI tool definitions with categories, ratings, features, strengths/weaknesses
-- **Usage Guides**: `src/data/aiUsageGuides.js` contains workflow guides for AI tool usage
+### Components
+- **Layout**: `AppLayout` — Fixed header, navigation, responsive
+- **UI System**: Shadcn/ui + Radix primitives
+- **Dynamic Icons**: `AIToolIcon` via @iconify/react
+- **Modal System**: Reusable for auth, payments, details, comparisons
 
-### Component Architecture
-- **AIToolsGrid.jsx**: Main component handling search, filtering, modals, and tool display
-- **AIToolIcon.jsx**: Dynamic icon rendering component for AI tools
-- **AIToolsContainer.jsx**: Container component for tool listings
-- **UI Components**: Located in `src/components/ui/` - Shadcn/ui components for consistent design
+### Data
+- **Static**: `src/data/aiTools.js`, `src/data/aiUsageGuides.js`, `src/features/*/data/`
+- **Service Layer**: `src/services/` (authService, paymentService, aiToolsService)
 
-### Key Features
-- **Search & Filter**: Category-based filtering and text search across tools
-- **Modal System**: Detailed tool information modals and workflow guides
-- **Prompt Generator**: Built-in AI prompt generation with model recommendations
-- **Responsive Design**: Mobile-first approach with Tailwind CSS
+---
 
-## Build Configuration
+## 3. Operation Flow (Per Session)
 
-- **Vite Config**: Base path set to `/ai-tool/` for GitHub Pages deployment
-- **Path Aliases**: `@` mapped to `./src` directory
-- **GitHub Pages**: Deploys from `dist` directory to `gh-pages` branch
+1. `/security-scan` — 0 production dependency vulnerabilities
+2. `/build` — 0 warnings, verify bundle/source maps
+3. `/deploy` — Verify production deployment URL
+4. `/seo-lighthouse` — Perf/Acc/Best/SEO **≥ 95**
 
-## Styling
+> Slash commands defined in `.claude/commands/*.md`
 
-- **Framework**: Tailwind CSS with custom configurations
-- **UI Library**: Shadcn/ui components
-- **Icons**: Lucide React icons with dynamic mapping
-- **Responsive**: Grid layouts that adapt to screen sizes
+---
 
-## Deployment
+## 4. Permissions & Security
 
-The project is configured for GitHub Pages deployment:
-- Homepage URL: `https://ryugw10.github.io/ai-tool`
-- Deployment branch: `gh-pages`
-- Build output: `dist` directory
+- **IAM Rule Priority**: `deny` > `allow`
+- **Config Files**:  
+  - Shared: `.claude/settings.json`  
+  - Local (gitignored): `.claude/settings.local.json`
+- **Allow**: `git:*`, `npm run build:*`, `npm audit:*`, `vercel:*`, `WebFetch(github.com)`
+- **Deny**: Read `.env`, `./secrets/**`, indiscriminate `WebFetch`, destructive file ops
+- **Secrets**: No secrets in repo — manage via `.env` locally or deployment environment vars
 
-## Data Structure
+---
 
-AI tools include comprehensive metadata:
-- Basic info (name, category, rating, description)
-- Strengths and weaknesses
-- Features and use cases
-- Competitive advantages
-- Integration capabilities
-- Free tier limitations
+## 5. Environment Variables (Names Only)
 
-## Korean Localization
+VITE_SUPABASE_URL
+VITE_SUPABASE_PUBLISHABLE_KEY
+GA4_MEASUREMENT_ID
+TOSS_CLIENT_KEY
+TOSS_SECRET_KEY
+PAYPAL_CLIENT_ID
+PAYPAL_SECRET
+CLERK_PUBLISHABLE_KEY
+GOOGLE_CLIENT_ID
+KAKAO_JS_KEY
 
-The application is specifically designed for Korean users with:
-- Korean language interface
-- AI tools curated for Korean market
-- Korean-specific use cases and examples
+---
+
+## 6. Slash Commands (Project-Specific)
+
+- `/security-scan` — `npm audit --production` summary by severity/package/action
+- `/build` — `npm run build` warnings/errors/bundle size summary
+- `/deploy` —  
+  - GH Pages: `npm run deploy` (after build)  
+  - Vercel: `vercel --prod --confirm`
+- `/seo-lighthouse` — Report & top 5 improvement suggestions
+
+---
+
+## 7. Analytics & Metrics
+
+- **GA4 Events**: `page_view`, `search`, `view_item`, `purchase`, `sign_up`
+- **KPI**: Free→Pro conversion, search success rate, bookmark conversion, DAU/MAU, MRR
+
+---
+
+## 8. Release Checklist
+
+- [ ] Security: High 0 / patched
+- [ ] Build: 0 warnings / bundle size checked
+- [ ] Deploy: URL verified / rollback notes ready
+- [ ] Performance: Lighthouse ≥ 95 / accessibility focus & contrast
+- [ ] Analytics: GA4 real-time tracking verified (`search`, `purchase`)
+
+---
+
+## 9. Definition of Done
+
+- Security scan High 0, build warnings 0
+- Verified deployment URL
+- Release notes: 5 lines (what / why / how / risks / rollback)
+- GA4 core events tracking
+- Smoke test basic routes
+
+---
+
+## 10. Development Commands
+
+npm run dev # Local dev (localhost:3002)
+npm run build # Production build
+npm run lint # ESLint
+npm run preview # Local preview of production build
+
+---
+
+## 11. Code Quality
+
+- ESLint flat config (`eslint.config.js`)
+- React Hooks rules via `eslint-plugin-react-hooks`
+- Ignore unused uppercase constants
+- Hot reload with react-refresh
+
+---
+
+## 12. Deployment
+
+- **Dev Server**: localhost:3002
+- **Build Output**: `/dist`
+- **Assets**: `/public`
+- **GitHub Pages**: Configured homepage URL
+- **Vercel**: Planned migration for server/webhook features
+
+---
+
+## 13. Change Log
+
+- YYYY-MM-DD: Merged architecture, security, deployment, and analytics documentation into single CLAUDE.md
+

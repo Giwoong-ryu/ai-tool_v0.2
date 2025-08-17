@@ -2,15 +2,54 @@
   "permissions": {
     "allow": [
       "Bash(npm run dev:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run build:*)",
       "Bash(mkdir:*)",
-      "Bash(copy AIToolsGrid.jsx ..backup-componentsai-tools )",
-      "Bash(copy AIToolsContainer.jsx ..backup-componentsai-tools )",
-      "Bash(copy AIToolsSearch.jsx ..backup-componentsai-tools )",
-      "Bash(copy AIWorkflows.jsx ..backup-componentsworkflows )",
-      "Bash(copy ImprovedMainLanding.jsx ..backup-componentsui-components)",
       "Bash(cp:*)",
-      "Bash(npm install:*)"
+      "Bash(copy:*)",
+      "WebFetch(domain:aitmpl.com)",
+      "WebFetch(domain:supabase.co)",
+      "WebFetch(domain:github.com)",
+      "Bash(npm audit:*)",
+      "Bash(vercel:*)",
+      "Bash(pnpm install:*)",
+      "Bash(pnpm remove:*)",
+      "Bash(pnpm add:*)",
+      "Bash(npx lighthouse:*)",
+      "Bash(curl:*)",
+      "Bash(pkill:*)",
+      "Bash(true)",
+      "Bash(dir /s)",
+      "Bash(ls:*)",
+      "Bash(rm:*)",
+      "Bash(node:*)",
+      "Bash(mv:*)",
+      "Bash(npm run preview:*)",
+      "mcp__playwright__browser_navigate",
+      "mcp__playwright__browser_click",
+      "mcp__playwright__browser_close",
+      "mcp__sequential-thinking__sequentialthinking"
     ],
     "deny": []
-  }
+  },
+  "workspaceRoot": "C:\\Users\\user\\Desktop\\gpt\\ai-tools-website",
+  "projectContext": {
+    "name": "이지픽 AI Tools Website",
+    "type": "React + Vite + Supabase",
+    "language": "JavaScript",
+    "framework": "React 18",
+    "styling": "Tailwind CSS",
+    "database": "Supabase (PostgreSQL)",
+    "authentication": "Supabase Auth",
+    "payment": "PayPal + Toss Payments"
+  },
+  "codeStyle": {
+    "preferFunctionalComponents": true,
+    "useTypeScript": false,
+    "indentation": 2,
+    "quotes": "single",
+    "semicolons": true
+  },
+  "autoSave": true,
+  "formatOnSave": true
 }
