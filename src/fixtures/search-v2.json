@@ -1,0 +1,60 @@
+{
+  "items": [
+    {
+      "id": "blog-draft",
+      "title": "블로그 글 초안 만들기",
+      "summary": "주제와 키워드를 입력하면 SEO 최적화된 블로그 글 구조를 생성합니다",
+      "type": "template",
+      "tags": ["블로그", "글쓰기", "SEO", "마케팅"]
+    },
+    {
+      "id": "ppt-outline",
+      "title": "PPT 목차 생성",
+      "summary": "발표 주제와 시간을 입력하면 논리적인 PPT 목차를 자동 생성합니다",
+      "type": "template",
+      "tags": ["프레젠테이션", "PPT", "목차", "발표"]
+    },
+    {
+      "id": "prompt-organizer",
+      "title": "프롬프트 정리",
+      "summary": "복잡한 프롬프트를 구조화하고 최적화하여 더 나은 결과를 얻습니다",
+      "type": "workflow",
+      "tags": ["프롬프트", "최적화", "구조화"]
+    },
+    {
+      "id": "email-template",
+      "title": "이메일 템플릿 생성",
+      "summary": "목적과 수신자에 맞는 전문적인 이메일 템플릿을 생성합니다",
+      "type": "template",
+      "tags": ["이메일", "비즈니스", "템플릿"]
+    },
+    {
+      "id": "social-media",
+      "title": "소셜미디어 콘텐츠",
+      "summary": "플랫폼별 특성에 맞는 매력적인 소셜미디어 콘텐츠를 생성합니다",
+      "type": "template",
+      "tags": ["소셜미디어", "콘텐츠", "마케팅"]
+    },
+    {
+      "id": "code-review",
+      "title": "코드 리뷰 가이드",
+      "summary": "효과적인 코드 리뷰를 위한 체크리스트와 피드백 방법을 제공합니다",
+      "type": "workflow",
+      "tags": ["코드리뷰", "개발", "품질관리"]
+    },
+    {
+      "id": "meeting-agenda",
+      "title": "회의 안건 작성",
+      "summary": "효율적인 회의를 위한 구조화된 안건과 타임라인을 생성합니다",
+      "type": "template",
+      "tags": ["회의", "안건", "업무효율"]
+    },
+    {
+      "id": "content-strategy",
+      "title": "콘텐츠 전략 수립",
+      "summary": "목표 고객과 브랜드에 맞는 콘텐츠 전략과 캘린더를 수립합니다",
+      "type": "workflow",
+      "tags": ["콘텐츠", "전략", "브랜딩"]
+    }
+  ]
+}

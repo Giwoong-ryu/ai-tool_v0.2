@@ -1,0 +1,98 @@
+# 1. 프로젝트 개요 (Project Overview)
+- **목적**
+  - 기존 AI 사용 시: 불확실한 답변, 오답, 목적 벗어남 → 사용 피로
+  - 목표: 보고서, PPT, 자기소개서 등 업무에 실질적 도움 제공 + 자동화
+  - 핵심: 앱 연동, 프롬프트 작성, AI 추천으로 안정적 결과 제공
+
+- **수익 모델**
+  1. 구독 기반 수익
+  2. 관련 앱/사이트 배너 광고
+
+- **미래 계획**
+  - 사이트 운영 과정을 투명하게 공유 (영상, 팁 등)
+  - 커뮤니티 허브로 확장
+
+---
+
+# 2. 타겟 정의 (Target Personas)
+
+## 타겟1: 일반 사용자  
+- 대상: 대학생, 직장인 등  
+- 니즈: 업무 간단 자동화, 신뢰할 수 있는 결과  
+- 페인포인트: AI 답변 오류, 품질 낮음
+
+## 타겟2: AI 활용 입문자  
+- 대상: 일반인 중 자동화·연동 관심자  
+- 니즈: Zapier 등 아웃풋 자동화 + 결과 안정화  
+- 페인포인트: 프롬프트 설계 어렵고 불안정
+
+## 타겟3: 고급 활용자 (추후)  
+- 대상: AI 사용 경험 있음, 정보 업데이트 필요  
+- 니즈: 최신 AI 도구 정보, 커뮤니티, 팁  
+- 페인포인트: 정보 산재, 변화 빠름
+
+---
+
+# 3. 문서 구성 (Documentation Structure)
+
+## 3.1 Zapier 워크플로우 예시
+- **파일**: `integrations/zapier_workflows.md`
+- **내용**:
+  - 주간 보고서 요약 → Slack 전송 (샘플 데이터 포함)
+  - Google Forms → 자기소개서 초안 (폼 예시 포함)
+  - 프롬프트 전략: Role, CoT, 형식, “I don’t know”
+
+## 3.2 프롬프트 템플릿 팩
+- **파일**: `templates/prompt_templates.jsonl`
+- 포함 항목:
+  - `id`, `version`, `purpose`, `target_persona`, `persona_details`, `inputs_schema`, `body_mustache`
+  - 실제 입력/출력 페어 포함
+
+## 3.3 프롬프트 전략 가이드
+- **파일**: `guides/prompting_best_practices.md`
+- 전략:
+  - Role prompting, Chain-of-Thought, Few-shot, 포맷 제약, 정직성 (근거/“I don’t know”)
+  - 각 전략 앞에 타겟별 적용 예시 주석
+
+## 3.4 타겟별 시나리오
+- **파일**: `scenarios/target_scenarios.md`
+- 구성:
+  - 타겟1 → 보고서/PPT/자기소개서 자동화
+  - 타겟2 → 자동화 흐름, 문서 변환 시나리오
+  - 타겟3 → 대시보드, 커뮤니티 콘텐츠
+
+## 3.5 실행 체크리스트
+- **파일**: `release/checklist_after_launch.md`
+- 항목:
+  - [Target1] Zapier 워크플로우 테스트
+  - [Target1] 템플릿 3종 검증
+  - [Target2] 자동화 시나리오 추가
+  - [Target3] 커뮤니티 허브 콘텐츠
+
+---
+
+# 4. 문서 작성 및 구성 원칙 (Documentation Best Practices)
+- 항상 **타겟과 목적 명시** → 문서 집중도↑, 혼선↓ :contentReference[oaicite:1]{index=1}
+- 독자의 현재 지식 수준을 고려 → 그들이 필요로 하는 정보만 제공 :contentReference[oaicite:2]{index=2}
+- 목적은 행동 유도를 위한 목적 (예: 요약, 초안 작성, 자동화)로 명시 :contentReference[oaicite:3]{index=3}
+- 구조: 목적 → 대상 → 예시 → 실행 가이드 → 체크리스트
+- 명료한 언어, 들여쓰기, 표, 시각자료 활용 :contentReference[oaicite:4]{index=4}
+
+---
+
+# 5. 요약 테이블 (Overview Table)
+
+| 문서 파일                  | 주요 목적                          | 포함 내용                         |
+|---------------------------|------------------------------------|----------------------------------|
+| Project Overview           | 전체 구조 공유                     | 타겟, 목적, 모델 요약             |
+| zapier_workflows.md        | 실제 자동화 예시 제공               | 샘플 데이터, 워크플로우, 프롬프트 전략 |
+| prompt_templates.jsonl     | 즉시 테스트 가능 템플릿 제공        | 실제 입력/출력 + 목적 설명         |
+| prompting_best_practices.md| 전략 공유 및 품질 통제              | 각 전략별 타겟별 적용 예시와 이유   |
+| target_scenarios.md        | 타겟별 활용 플랜 수립               | 각 타겟 페인포인트 기반 시나리오    |
+| checklist_after_launch.md  | 실행 준비 완성 기준                 | 타겟별 필수 항목 체크리스트        |
+
+---
+
+위 구성은 그대로 다른 창으로 복사해 활용할 수 있다.  
+필요 시, 각 문서 내 ‘persona_details’ 샘플, 샘플 데이터 값, 워크플로우 구성 등도 바로 채워 넣을 수 있도록 확장 가능하다.
+::contentReference[oaicite:5]{index=5}

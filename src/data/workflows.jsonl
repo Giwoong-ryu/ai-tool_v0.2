@@ -1,0 +1,15 @@
+{"id":"workflow.report.weekly","title":"주간 보고서 요약→슬랙 전송","steps":[
+  {"type":"instruction","checklist":["주간 데이터 범위 확인","결측치 보정"]},
+  {"type":"generator","template_id":"summary.weekly_report"},
+  {"type":"manual","action":"열기","target":"slack://channel/#reports","note":"요약 붙여넣기 후 고정"}
+]}
+{"id":"workflow.ppt.outline","title":"업무 발표 목차 생성","steps":[
+  {"type":"instruction","checklist":["주제/청중 정의","핵심 메시지 1문장 작성"]},
+  {"type":"generator","template_id":"ppt.outline.business"},
+  {"type":"manual","action":"열기","target":"https://gamma.app","note":"목차 붙여넣고 자동 생성"}
+]}
+{"id":"workflow.resume.from_form","title":"폼→자기소개서 자동화","steps":[
+  {"type":"manual","action":"열기","target":"https://forms.google.com","note":"응답 수집"},
+  {"type":"generator","template_id":"automation.form_to_resume"},
+  {"type":"instruction","checklist":["민감정보 제거","톤 점검","분량 600자±10%"]}
+]}
