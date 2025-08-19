@@ -1,0 +1,682 @@
+/* EasyPick Billing & Upgrade Page Styles */
+/* 목적: 프리미엄 결제 UI 및 업그레이드 관련 스타일 (한국 시장 최적화) */
+/* 작성자: Frontend Engineer with Korean UX Expertise */
+
+/* ==================== 폰트 & 타이포그래피 ==================== */
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css');
+
+.billing-page {
+  font-family: -apple-system, BlinkMacSystemFont, "Pretendard Variable", Pretendard, 
+               -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", 
+               "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", 
+               "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+  font-feature-settings: "tnum", "kern";
+}
+
+/* ==================== 색상 시스템 ==================== */
+:root {
+  /* Primary Colors (Purple-Pink Gradient) */
+  --billing-primary-purple: #8b5cf6;
+  --billing-primary-pink: #ec4899;
+  --billing-gradient-primary: linear-gradient(135deg, var(--billing-primary-purple), var(--billing-primary-pink));
+  
+  /* Plan Colors */
+  --billing-free-color: #6b7280;
+  --billing-free-bg: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+  --billing-pro-color: var(--billing-primary-purple);
+  --billing-pro-bg: var(--billing-gradient-primary);
+  --billing-team-color: #2563eb;
+  --billing-team-bg: linear-gradient(135deg, #3b82f6, #06b6d4);
+  
+  /* Korean Currency Colors */
+  --billing-price-primary: #1f2937;
+  --billing-price-secondary: #6b7280;
+  --billing-discount-green: #059669;
+  --billing-savings-bg: #d1fae5;
+  
+  /* Status Colors */
+  --billing-success: #059669;
+  --billing-warning: #d97706;
+  --billing-error: #dc2626;
+  --billing-info: #2563eb;
+  
+  /* Korean UI Colors */
+  --billing-border-light: #e5e7eb;
+  --billing-border-medium: #d1d5db;
+  --billing-background-soft: #f9fafb;
+  --billing-background-elevated: #ffffff;
+}
+
+/* ==================== 반응형 브레이크포인트 ==================== */
+/* Mobile-First Design for Korean Market */
+.billing-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+@media (min-width: 640px) {
+  .billing-container {
+    padding: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .billing-container {
+    padding: 2rem;
+  }
+}
+
+/* ==================== 가격 표시 스타일 ==================== */
+.billing-price {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+.billing-price-primary {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--billing-price-primary);
+  line-height: 1.2;
+}
+
+.billing-price-secondary {
+  font-size: 1rem;
+  color: var(--billing-price-secondary);
+}
+
+.billing-currency {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--billing-price-secondary);
+  margin-left: 0.25rem;
+}
+
+/* 한국 원화 표시 최적화 */
+.billing-krw {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--billing-price-secondary);
+}
+
+/* ==================== 할인 표시 ==================== */
+.billing-discount-badge {
+  background: var(--billing-discount-green);
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  position: absolute;
+  top: -0.5rem;
+  right: -0.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.billing-savings {
+  background: var(--billing-savings-bg);
+  color: var(--billing-discount-green);
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  text-align: center;
+  margin-top: 0.5rem;
+}
+
+.billing-original-price {
+  text-decoration: line-through;
+  color: var(--billing-price-secondary);
+  font-size: 1rem;
+  opacity: 0.7;
+}
+
+/* ==================== 플랜 카드 스타일 ==================== */
+.billing-plan-card {
+  background: var(--billing-background-elevated);
+  border: 2px solid var(--billing-border-light);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+.billing-plan-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.billing-plan-card.selected {
+  border-color: var(--billing-primary-purple);
+  box-shadow: 0 0 0 1px var(--billing-primary-purple);
+}
+
+.billing-plan-card.popular {
+  border-color: var(--billing-primary-purple);
+  position: relative;
+}
+
+.billing-plan-card.popular::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: var(--billing-gradient-primary);
+  border-radius: 1rem;
+  z-index: -1;
+}
+
+/* 플랜 아이콘 */
+.billing-plan-icon {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+  color: white;
+  font-size: 1.5rem;
+}
+
+.billing-plan-icon.free {
+  background: var(--billing-free-bg);
+  color: var(--billing-free-color);
+}
+
+.billing-plan-icon.pro {
+  background: var(--billing-pro-bg);
+}
+
+.billing-plan-icon.team {
+  background: var(--billing-team-bg);
+}
+
+/* ==================== 기능 리스트 ==================== */
+.billing-feature-list {
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0;
+}
+
+.billing-feature-item {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--billing-border-light);
+}
+
+.billing-feature-item:last-child {
+  border-bottom: none;
+}
+
+.billing-feature-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-right: 0.75rem;
+  flex-shrink: 0;
+}
+
+.billing-feature-icon.check {
+  color: var(--billing-success);
+}
+
+.billing-feature-icon.x {
+  color: var(--billing-price-secondary);
+}
+
+.billing-feature-text {
+  font-size: 0.875rem;
+  color: var(--billing-price-primary);
+  line-height: 1.5;
+}
+
+.billing-feature-text.disabled {
+  color: var(--billing-price-secondary);
+}
+
+/* ==================== 버튼 스타일 ==================== */
+.billing-cta-button {
+  width: 100%;
+  padding: 0.875rem 1.5rem;
+  border: none;
+  border-radius: 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  text-decoration: none;
+}
+
+.billing-cta-button.primary {
+  background: var(--billing-gradient-primary);
+  color: white;
+}
+
+.billing-cta-button.primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 25px -3px rgba(139, 92, 246, 0.3);
+}
+
+.billing-cta-button.secondary {
+  background: var(--billing-background-soft);
+  color: var(--billing-price-primary);
+  border: 1px solid var(--billing-border-medium);
+}
+
+.billing-cta-button.secondary:hover {
+  background: var(--billing-border-light);
+}
+
+.billing-cta-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ==================== 결제 주기 토글 ==================== */
+.billing-cycle-toggle {
+  display: flex;
+  background: var(--billing-background-soft);
+  border-radius: 0.75rem;
+  padding: 0.25rem;
+  margin: 2rem auto;
+  width: fit-content;
+  position: relative;
+}
+
+.billing-cycle-option {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  background: transparent;
+  color: var(--billing-price-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease-in-out;
+  position: relative;
+}
+
+.billing-cycle-option.active {
+  background: white;
+  color: var(--billing-price-primary);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.billing-cycle-option .discount-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: var(--billing-discount-green);
+  color: white;
+  font-size: 0.625rem;
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  font-weight: 600;
+}
+
+/* ==================== 비교 테이블 ==================== */
+.billing-comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 2rem 0;
+  background: white;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.billing-comparison-table th,
+.billing-comparison-table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--billing-border-light);
+}
+
+.billing-comparison-table th {
+  background: var(--billing-background-soft);
+  font-weight: 600;
+  color: var(--billing-price-primary);
+}
+
+.billing-comparison-table td {
+  color: var(--billing-price-secondary);
+}
+
+.billing-comparison-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* 모바일에서 테이블 스크롤 */
+@media (max-width: 768px) {
+  .billing-comparison-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .billing-comparison-table {
+    min-width: 600px;
+  }
+}
+
+/* ==================== 신뢰 지표 ==================== */
+.billing-trust-indicators {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background: var(--billing-background-soft);
+  border-radius: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.billing-trust-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--billing-price-secondary);
+  font-size: 0.875rem;
+}
+
+.billing-trust-icon {
+  width: 1rem;
+  height: 1rem;
+  color: var(--billing-success);
+}
+
+/* ==================== 쿼터 표시 ==================== */
+.billing-quota-display {
+  background: var(--billing-background-soft);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+.billing-quota-bar {
+  width: 100%;
+  height: 0.5rem;
+  background: var(--billing-border-light);
+  border-radius: 0.25rem;
+  overflow: hidden;
+  margin: 0.5rem 0;
+}
+
+.billing-quota-progress {
+  height: 100%;
+  background: var(--billing-gradient-primary);
+  transition: width 0.3s ease-in-out;
+}
+
+.billing-quota-progress.warning {
+  background: linear-gradient(90deg, var(--billing-warning), #f59e0b);
+}
+
+.billing-quota-progress.danger {
+  background: linear-gradient(90deg, var(--billing-error), #ef4444);
+}
+
+.billing-quota-text {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  color: var(--billing-price-secondary);
+}
+
+/* ==================== 애니메이션 ==================== */
+@keyframes billing-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes billing-shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.billing-loading {
+  animation: billing-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.billing-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.billing-shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+  animation: billing-shimmer 1.5s infinite;
+}
+
+/* ==================== 접근성 ==================== */
+/* 고대비 모드 지원 */
+@media (prefers-contrast: high) {
+  :root {
+    --billing-border-light: #000000;
+    --billing-border-medium: #000000;
+    --billing-price-secondary: #000000;
+  }
+  
+  .billing-plan-card {
+    border-width: 3px;
+  }
+}
+
+/* 모션 감소 설정 */
+@media (prefers-reduced-motion: reduce) {
+  .billing-plan-card,
+  .billing-cta-button,
+  .billing-quota-progress {
+    transition: none;
+  }
+  
+  .billing-loading,
+  .billing-shimmer::after {
+    animation: none;
+  }
+}
+
+/* 포커스 스타일 */
+.billing-plan-card:focus,
+.billing-cta-button:focus,
+.billing-cycle-option:focus {
+  outline: 2px solid var(--billing-primary-purple);
+  outline-offset: 2px;
+}
+
+/* ==================== 다크 모드 지원 ==================== */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --billing-price-primary: #f9fafb;
+    --billing-price-secondary: #d1d5db;
+    --billing-background-soft: #1f2937;
+    --billing-background-elevated: #111827;
+    --billing-border-light: #374151;
+    --billing-border-medium: #4b5563;
+  }
+  
+  .billing-plan-card {
+    background: var(--billing-background-elevated);
+  }
+  
+  .billing-comparison-table th {
+    background: var(--billing-background-soft);
+  }
+}
+
+/* ==================== 프린트 스타일 ==================== */
+@media print {
+  .billing-page {
+    background: white !important;
+    color: black !important;
+  }
+  
+  .billing-cta-button,
+  .billing-cycle-toggle {
+    display: none !important;
+  }
+  
+  .billing-plan-card {
+    border: 2px solid #000 !important;
+    box-shadow: none !important;
+  }
+}
+
+/* ==================== 유틸리티 클래스 ==================== */
+.billing-text-center { text-align: center; }
+.billing-text-left { text-align: left; }
+.billing-text-right { text-align: right; }
+
+.billing-mb-1 { margin-bottom: 0.25rem; }
+.billing-mb-2 { margin-bottom: 0.5rem; }
+.billing-mb-3 { margin-bottom: 0.75rem; }
+.billing-mb-4 { margin-bottom: 1rem; }
+.billing-mb-6 { margin-bottom: 1.5rem; }
+.billing-mb-8 { margin-bottom: 2rem; }
+
+.billing-mt-1 { margin-top: 0.25rem; }
+.billing-mt-2 { margin-top: 0.5rem; }
+.billing-mt-3 { margin-top: 0.75rem; }
+.billing-mt-4 { margin-top: 1rem; }
+.billing-mt-6 { margin-top: 1.5rem; }
+.billing-mt-8 { margin-top: 2rem; }
+
+.billing-p-1 { padding: 0.25rem; }
+.billing-p-2 { padding: 0.5rem; }
+.billing-p-3 { padding: 0.75rem; }
+.billing-p-4 { padding: 1rem; }
+.billing-p-6 { padding: 1.5rem; }
+.billing-p-8 { padding: 2rem; }
+
+.billing-hidden { display: none; }
+.billing-block { display: block; }
+.billing-flex { display: flex; }
+.billing-inline-flex { display: inline-flex; }
+.billing-grid { display: grid; }
+
+.billing-w-full { width: 100%; }
+.billing-h-full { height: 100%; }
+
+.billing-rounded { border-radius: 0.25rem; }
+.billing-rounded-md { border-radius: 0.375rem; }
+.billing-rounded-lg { border-radius: 0.5rem; }
+.billing-rounded-xl { border-radius: 0.75rem; }
+.billing-rounded-full { border-radius: 9999px; }
+
+/* ==================== 반응형 그리드 ==================== */
+.billing-grid-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+.billing-grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.billing-grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+@media (min-width: 640px) {
+  .sm\:billing-grid-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+  .sm\:billing-grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .sm\:billing-grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (min-width: 768px) {
+  .md\:billing-grid-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+  .md\:billing-grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .md\:billing-grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (min-width: 1024px) {
+  .lg\:billing-grid-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+  .lg\:billing-grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .lg\:billing-grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+/* ==================== 한국어 최적화 ==================== */
+.billing-korean-text {
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  line-height: 1.6;
+}
+
+.billing-korean-price {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.025em;
+}
+
+/* 한국어 숫자 및 통화 표시 */
+.billing-currency-krw::after {
+  content: '원';
+  font-size: 0.875em;
+  color: var(--billing-price-secondary);
+  margin-left: 0.125rem;
+}
+
+/* 한국 휴대폰에서 터치 최적화 */
+@media (max-width: 767px) {
+  .billing-cta-button {
+    min-height: 44px; /* iOS 최소 터치 영역 */
+    font-size: 1.125rem;
+  }
+  
+  .billing-plan-card {
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .billing-price-primary {
+    font-size: 2rem;
+  }
+}
+
+/* ==================== 성능 최적화 ==================== */
+.billing-page * {
+  box-sizing: border-box;
+}
+
+/* GPU 가속 활성화 */
+.billing-plan-card,
+.billing-cta-button {
+  will-change: transform;
+}
+
+/* 레이어 분리 */
+.billing-plan-card:hover {
+  transform: translateZ(0) translateY(-2px);
+}
+
+/* 임계 렌더링 경로 최적화 */
+.billing-above-fold {
+  contain: layout style paint;
+}
+
+/* ==================== 브랜드 통합 ==================== */
+.billing-brand-purple {
+  background: var(--billing-gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 700;
+}
+
+.billing-brand-shadow {
+  text-shadow: 0 2px 4px rgba(139, 92, 246, 0.3);
+}

@@ -28,7 +28,9 @@
       "mcp__playwright__browser_navigate",
       "mcp__playwright__browser_click",
       "mcp__playwright__browser_close",
-      "mcp__sequential-thinking__sequentialthinking"
+      "mcp__sequential-thinking__sequentialthinking",
+      "Bash(supabase status:*)",
+      "Bash(touch:*)"
     ],
     "deny": []
   },

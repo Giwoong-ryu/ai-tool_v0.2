@@ -2,6 +2,8 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { AuthService } from '../services/authService.js'
+import { guardService } from '../services/guardService.ts'
+import { featureFlags } from '../config/featureFlags.ts'
 
 const useAuthStore = create(
   persist(
@@ -11,6 +13,12 @@ const useAuthStore = create(
       profile: null,
       isAuthenticated: false,
       isLoading: true,
+      
+      // Plan & Permission State
+      currentPlan: 'free',
+      teamPlan: null,
+      quotaStatus: {},
+      permissionCache: new Map(),
 
       // Actions
       initialize: async () => {
@@ -36,6 +44,9 @@ const useAuthStore = create(
                     profile, 
                     isAuthenticated: true 
                   })
+                  
+                  // 권한 시스템 업데이트
+                  get().updatePermissions()
                 } catch (error) {
                   console.error('Get current user error:', error)
                   // 에러가 발생해도 기본 사용자 정보는 설정
@@ -49,7 +60,11 @@ const useAuthStore = create(
                 set({ 
                   user: null, 
                   profile: null, 
-                  isAuthenticated: false 
+                  isAuthenticated: false,
+                  currentPlan: 'free',
+                  teamPlan: null,
+                  quotaStatus: {},
+                  permissionCache: new Map()
                 })
               }
             })
@@ -62,8 +77,17 @@ const useAuthStore = create(
             user: null, 
             profile: null, 
             isAuthenticated: false, 
-            isLoading: false 
+            isLoading: false,
+            currentPlan: 'free',
+            teamPlan: null,
+            quotaStatus: {},
+            permissionCache: new Map()
           })
+        }
+        
+        // 초기 권한 업데이트
+        if (get().isAuthenticated) {
+          get().updatePermissions()
         }
       },
 
@@ -194,6 +218,126 @@ const useAuthStore = create(
         }
       },
 
+      // Permission & Plan Management
+      updatePermissions: async () => {
+        try {
+          await guardService.updateUserPlan()
+          const planInfo = guardService.featureFlags?.getPlanInfo()
+          
+          if (planInfo) {
+            set({
+              currentPlan: planInfo.plan,
+              teamPlan: planInfo.isTeamPlan ? planInfo.plan : null
+            })
+          }
+        } catch (error) {
+          console.error('Update permissions error:', error)
+        }
+      },
+
+      checkPermission: async (action, resourceId, quantity = 1) => {
+        try {
+          return await guardService.checkPermission(action, resourceId, quantity)
+        } catch (error) {
+          console.error('Check permission error:', error)
+          return { allowed: false, error: { message: '권한 확인 중 오류가 발생했습니다.' } }
+        }
+      },
+
+      executeWithGuard: async (action, operation, options = {}) => {
+        try {
+          return await guardService.executeWithGuard(action, operation, options)
+        } catch (error) {
+          console.error('Execute with guard error:', error)
+          throw error
+        }
+      },
+
+      hasFeature: (feature) => {
+        try {
+          return guardService.hasFeature(feature)
+        } catch (error) {
+          console.error('Check feature error:', error)
+          return false
+        }
+      },
+
+      getQuotaStatus: async (action) => {
+        try {
+          const quota = await guardService.getQuotaStatus(action)
+          if (quota) {
+            set(state => ({
+              quotaStatus: {
+                ...state.quotaStatus,
+                [action]: quota
+              }
+            }))
+          }
+          return quota
+        } catch (error) {
+          console.error('Get quota status error:', error)
+          return null
+        }
+      },
+
+      // Enhanced usage methods with guard integration
+      checkUsageLimitWithGuard: async (action = 'compile') => {
+        const result = await get().checkPermission(action)
+        return result.allowed
+      },
+
+      incrementUsageWithGuard: async (action = 'compile', resourceId) => {
+        try {
+          const result = await get().checkPermission(action, resourceId)
+          if (!result.allowed) {
+            return false
+          }
+
+          // 기존 incrementUsage 로직 유지
+          const { user, profile } = get()
+          if (!user) return false
+
+          const apiResult = await AuthService.incrementUsage(user.id)
+          if (apiResult && profile) {
+            set(state => ({
+              profile: {
+                ...state.profile,
+                usage_count: (state.profile?.usage_count || 0) + 1
+              }
+            }))
+          }
+
+          // 쿼터 상태 업데이트
+          await get().getQuotaStatus(action)
+          
+          return apiResult
+        } catch (error) {
+          console.error('Increment usage with guard error:', error)
+          return false
+        }
+      },
+
+      // Plan and subscription helpers
+      getCurrentPlan: () => {
+        const { teamPlan, currentPlan } = get()
+        return teamPlan || currentPlan
+      },
+
+      isUnlimitedPlan: () => {
+        const plan = get().getCurrentPlan()
+        return plan === 'pro' || plan === 'team'
+      },
+
+      getUpgradeUrl: (feature) => {
+        try {
+          const upgradeInfo = guardService.getUpgradeInfo(get().getCurrentPlan(), feature)
+          return upgradeInfo?.upgradeUrl || '/pricing'
+        } catch (error) {
+          console.error('Get upgrade URL error:', error)
+          return '/pricing'
+        }
+      },
+
       // Cleanup
       cleanup: () => {
         const { authStateListener } = get()
@@ -201,6 +345,10 @@ const useAuthStore = create(
           authStateListener.unsubscribe()
           set({ authStateListener: null })
         }
+        
+        // 캐시 정리
+        guardService.clearCache()
+        set({ permissionCache: new Map() })
       }
     }),
     {
@@ -208,7 +356,10 @@ const useAuthStore = create(
       partialize: (state) => ({
         user: state.user,
         profile: state.profile,
-        isAuthenticated: state.isAuthenticated
+        isAuthenticated: state.isAuthenticated,
+        currentPlan: state.currentPlan,
+        teamPlan: state.teamPlan,
+        quotaStatus: state.quotaStatus
       })
     }
   )

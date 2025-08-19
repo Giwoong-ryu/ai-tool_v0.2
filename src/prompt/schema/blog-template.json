@@ -1,0 +1,220 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "블로그 글 작성 템플릿 스키마",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "const": "blog_article"
+    },
+    "name": {
+      "type": "string",
+      "const": "블로그 글 작성"
+    },
+    "category": {
+      "type": "string",
+      "const": "콘텐츠"
+    },
+    "description": {
+      "type": "string",
+      "const": "블로그나 기술 문서 작성을 위한 프롬프트"
+    },
+    "icon": {
+      "type": "string",
+      "default": "📚"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "default": "1.0.0"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "deprecated", "draft"],
+      "default": "active"
+    },
+    "template": {
+      "type": "string",
+      "minLength": 100,
+      "description": "Handlebars 템플릿 문자열"
+    },
+    "options": {
+      "type": "array",
+      "minItems": 4,
+      "items": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "enum": ["topic", "target_audience", "style", "length"]
+          },
+          "label": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["text", "select"]
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "placeholder": {
+            "type": "string"
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "defaultValue": {
+            "type": "string"
+          }
+        },
+        "required": ["key", "label", "type", "required"],
+        "allOf": [
+          {
+            "if": {
+              "properties": { "key": { "const": "topic" } }
+            },
+            "then": {
+              "properties": {
+                "label": { "const": "주제" },
+                "type": { "const": "text" },
+                "required": { "const": true },
+                "placeholder": { "const": "작성하고 싶은 주제를 입력하세요" }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": { "key": { "const": "target_audience" } }
+            },
+            "then": {
+              "properties": {
+                "label": { "const": "대상 독자" },
+                "type": { "const": "select" },
+                "required": { "const": true },
+                "options": {
+                  "type": "array",
+                  "contains": {
+                    "type": "string",
+                    "enum": ["일반인", "초보자", "중급자", "전문가", "10대", "20-30대", "40-50대 이상"]
+                  },
+                  "minItems": 7
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": { "key": { "const": "style" } }
+            },
+            "then": {
+              "properties": {
+                "label": { "const": "글 스타일" },
+                "type": { "const": "select" },
+                "required": { "const": true },
+                "options": {
+                  "type": "array",
+                  "contains": {
+                    "type": "string",
+                    "enum": ["정보 전달형", "스토리텔링형", "가이드/튜토리얼", "의견/리뷰형", "사례 중심형", "논쟁/토론형"]
+                  },
+                  "minItems": 6
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": { "key": { "const": "length" } }
+            },
+            "then": {
+              "properties": {
+                "label": { "const": "글 길이" },
+                "type": { "const": "select" },
+                "required": { "const": true },
+                "options": {
+                  "type": "array",
+                  "contains": {
+                    "type": "string",
+                    "enum": ["짧게 (500-800자)", "보통 (1000-1500자)", "길게 (2000자 이상)"]
+                  },
+                  "minItems": 3
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "author": {
+          "type": "string",
+          "default": "EasyPick"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": ["콘텐츠", "블로그", "글쓰기", "문서작성"]
+        },
+        "difficulty": {
+          "type": "string",
+          "enum": ["beginner", "intermediate", "advanced"],
+          "default": "intermediate"
+        },
+        "estimatedTime": {
+          "type": "string",
+          "default": "10-15분"
+        },
+        "usage": {
+          "type": "object",
+          "properties": {
+            "totalUsage": {
+              "type": "number",
+              "minimum": 0,
+              "default": 0
+            },
+            "monthlyUsage": {
+              "type": "number",
+              "minimum": 0,
+              "default": 0
+            }
+          }
+        }
+      }
+    },
+    "defaults": {
+      "type": "object",
+      "properties": {
+        "target_audience": {
+          "type": "string",
+          "default": "일반인"
+        },
+        "style": {
+          "type": "string",
+          "default": "정보 전달형"
+        },
+        "length": {
+          "type": "string",
+          "default": "보통 (1000-1500자)"
+        }
+      }
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": ["id", "name", "category", "description", "template", "options"],
+  "additionalProperties": false
+}

@@ -138,31 +138,52 @@ export class PaymentService {
     })
   }
 
-  // 결제 성공 처리 (웹훅이나 리다이렉트에서 호출)
+  // 결제 성공 처리 (성공 페이지에서 호출)
   static async confirmPayment(paymentKey, orderId, amount) {
     try {
       console.log('결제 확인 시작:', { paymentKey, orderId, amount })
       
-      // 임시로 DB만 업데이트 (실제로는 백엔드에서 토스 API 호출 후 처리)
-      const { error: updateError } = await supabase
+      // Toss Payments API로 결제 정보 확인
+      const paymentInfo = await this.verifyTossPayment(paymentKey, orderId, amount)
+      
+      if (!paymentInfo || paymentInfo.status !== 'DONE') {
+        throw new Error('결제가 완료되지 않았습니다.')
+      }
+      
+      // DB 업데이트는 webhook에서 처리되므로 여기서는 확인만
+      const { data: payment, error: paymentError } = await supabase
         .from('payments')
-        .update({
-          payment_key: paymentKey,
-          status: 'completed',
-          paid_at: new Date().toISOString()
-        })
+        .select('*')
         .eq('order_id', orderId)
+        .single()
+      
+      if (paymentError) {
+        console.error('결제 정보 조회 오류:', paymentError)
+        throw paymentError
+      }
+      
+      // 웹훅이 아직 처리되지 않은 경우 수동으로 업데이트
+      if (payment.status === 'pending') {
+        const { error: updateError } = await supabase
+          .from('payments')
+          .update({
+            payment_key: paymentKey,
+            status: 'completed',
+            paid_at: paymentInfo.approvedAt
+          })
+          .eq('order_id', orderId)
 
-      if (updateError) {
-        console.error('DB 업데이트 오류:', updateError)
-        throw updateError
+        if (updateError) {
+          console.error('DB 업데이트 오류:', updateError)
+          throw updateError
+        }
+
+        // 구독 정보 생성/업데이트
+        await this.updateSubscription(orderId)
       }
 
-      // 구독 정보 생성/업데이트
-      await this.updateSubscription(orderId)
-
       console.log('결제 확인 완료')
-      return { success: true, paymentResult: { paymentKey, orderId, amount } }
+      return { success: true, paymentResult: paymentInfo }
 
     } catch (error) {
       console.error('Payment confirmation error:', error)
@@ -180,6 +201,42 @@ export class PaymentService {
         console.error('실패 상태 업데이트 오류:', updateError)
       }
 
+      throw error
+    }
+  }
+
+  // Toss Payments API로 결제 정보 확인
+  static async verifyTossPayment(paymentKey, orderId, amount) {
+    try {
+      const secretKey = import.meta.env.VITE_TOSS_SECRET_KEY
+      if (!secretKey) {
+        throw new Error('Toss Secret Key가 설정되지 않았습니다.')
+      }
+
+      const response = await fetch(`https://api.tosspayments.com/v1/payments/confirm`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Basic ${btoa(secretKey + ':')}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          paymentKey: paymentKey,
+          orderId: orderId,
+          amount: amount
+        })
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || '결제 확인에 실패했습니다.')
+      }
+
+      const paymentData = await response.json()
+      console.log('Toss API 결제 확인:', paymentData)
+      
+      return paymentData
+    } catch (error) {
+      console.error('Toss API 결제 확인 오류:', error)
       throw error
     }
   }

@@ -17,6 +17,12 @@ import EasyPickHero from "./EasyPickHero.jsx";
 import EasyPickOurStory from "./EasyPickOurStory.jsx";
 import PricingCompact from "./PricingCompact.jsx";
 
+// <mark>Step 4: 4개 컴포넌트 레이아웃 결선 - Import</mark>
+import SearchHubV2 from './SearchHub.v2';
+import ActionBarV2 from './ActionBar.v2';
+import RunnerTimelineV2 from './RunnerTimeline.v2';
+import SideSheetV2 from './SideSheet.v2';
+
 
 // 재사용 가능한 UI 컴포넌트들
 const Button = ({ children, className, ...props }) => (
@@ -97,9 +103,16 @@ const NewMainLanding = ({
   onNavigate,
   onAuthClick,
   onProPlanClick,
-}) => {
+) => {
   const navigate = useNavigate();
   const [showPaidPlans, setShowPaidPlans] = React.useState(false);
+
+  // <mark>Step 4: 4개 컴포넌트 레이아웃 결선 - State Management</mark>
+  const [selectedItem, setSelectedItem] = React.useState(null);
+  const [showActionBar, setShowActionBar] = React.useState(false);
+  const [timelineSteps, setTimelineSteps] = React.useState([]);
+  const [showSideSheet, setShowSideSheet] = React.useState(false);
+  const [currentWorkflow, setCurrentWorkflow] = React.useState(null);
 
   // AuthStore를 안전하게 사용
   let user = null;
@@ -116,6 +129,58 @@ const NewMainLanding = ({
   } catch (error) {
     console.warn("Auth store error in NewMainLanding:", error);
   }
+
+  // <mark>Step 4: 4개 컴포넌트 레이아웃 결선 - Event Handlers</mark>
+  const handleToolSelect = (tool) => {
+    setSelectedItem({
+      id: tool.id,
+      title: tool.name || tool.title,
+      type: 'tool',
+      category: tool.category,
+      url: tool.url
+    });
+    setShowActionBar(true);
+    setShowSideSheet(true);
+  };
+
+  const handleTemplateSelect = (template) => {
+    setSelectedItem({
+      id: template.id,
+      title: template.title,
+      type: 'template',
+      category: template.category,
+      template: template.content
+    });
+    setShowSideSheet(true);
+  };
+
+  const handleWorkflowSelect = (workflow) => {
+    setCurrentWorkflow(workflow);
+    const mockSteps = [
+      {
+        id: 'step-1',
+        title: '워크플로우 시작',
+        stepNumber: 1,
+        status: 'pending',
+        description: workflow.title + ' 워크플로우를 시작합니다'
+      },
+      {
+        id: 'step-2',
+        title: '데이터 준비',
+        stepNumber: 2,
+        status: 'pending',
+        description: '필요한 데이터를 준비합니다'
+      },
+      {
+        id: 'step-3',
+        title: '실행 완료',
+        stepNumber: 3,
+        status: 'pending',
+        description: '워크플로우를 완료합니다'
+      }
+    ];
+    setTimelineSteps(mockSteps);
+  };
 
   // 외부 클릭시 드롭다운 닫기
   React.useEffect(() => {
@@ -196,6 +261,19 @@ const NewMainLanding = ({
           onAuthClick={onAuthClick}
           onProPlanClick={onProPlanClick}
         />
+        
+        {/* <mark>Step 4: SearchHub.v2 컴포넌트 결선</mark> */}
+        <section className="py-16 bg-gray-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <SearchHubV2
+              onToolSelect={handleToolSelect}
+              onTemplateSelect={handleTemplateSelect}
+              onWorkflowSelect={handleWorkflowSelect}
+              className="mb-8"
+            />
+          </div>
+        </section>
+
         <EasyPickOurStory />
       </div>
 
@@ -250,6 +328,43 @@ const NewMainLanding = ({
             </div>
           </div>
         </section>
+
+        {/* <mark>Step 4: RunnerTimeline.v2 컴포넌트 결선</mark> */}
+        {timelineSteps.length > 0 && (
+          <section className="py-16 bg-white">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                  워크플로우 실행
+                </h2>
+                <p className="text-lg text-gray-700">
+                  선택한 워크플로우의 진행 상황을 확인하세요
+                </p>
+              </div>
+              <RunnerTimelineV2
+                steps={timelineSteps}
+                onStepComplete={(stepId) => {
+                  setTimelineSteps(prev => 
+                    prev.map(step => 
+                      step.id === stepId 
+                        ? { ...step, status: step.status === 'completed' ? 'pending' : 'completed' }
+                        : step
+                    )
+                  );
+                }}
+                onStepCheck={(stepId) => {
+                  setTimelineSteps(prev =>
+                    prev.map(step =>
+                      step.id === stepId
+                        ? { ...step, isChecked: !step.isChecked }
+                        : step
+                    )
+                  );
+                }}
+              />
+            </div>
+          </section>
+        )}
 
         <PricingCompact />
 
@@ -357,6 +472,28 @@ const NewMainLanding = ({
           </div>
         </footer>
       </div>
+
+      {/* <mark>Step 4: ActionBar.v2 컴포넌트 결선</mark> */}
+      {showActionBar && selectedItem && (
+        <ActionBarV2
+          item={selectedItem}
+          isVisible={showActionBar}
+          onClose={() => {
+            setShowActionBar(false);
+            setSelectedItem(null);
+          }}
+        />
+      )}
+
+      {/* <mark>Step 4: SideSheet.v2 컴포넌트 결선</mark> */}
+      <SideSheetV2
+        isOpen={showSideSheet}
+        onClose={() => {
+          setShowSideSheet(false);
+          setSelectedItem(null);
+        }}
+        item={selectedItem}
+      />
 
     </div>
   );

@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EasyPick Edge Functions Frontend Test</title>
+    <style>
+        body { font-family: -apple-system, system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+        .success { color: #28a745; }
+        .error { color: #dc3545; }
+        .info { color: #007bff; }
+        button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        #results { background: #f8f9fa; padding: 15px; margin: 10px 0; border-radius: 4px; font-family: monospace; white-space: pre-wrap; }
+        input[type="text"] { padding: 8px; margin: 5px; border: 1px solid #ddd; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <h1>🧪 EasyPick Edge Functions Frontend Test</h1>
+    <p>이 페이지에서 Edge Functions의 프론트엔드 연동을 테스트할 수 있습니다.</p>
+
+    <div class="test-section">
+        <h2>⚙️ 설정</h2>
+        <label>
+            Supabase URL:
+            <input type="text" id="supabaseUrl" value="http://127.0.0.1:54321" style="width: 300px;">
+        </label><br>
+        <label>
+            JWT Token (선택):
+            <input type="text" id="jwtToken" placeholder="Bearer token (선택사항)" style="width: 400px;">
+        </label>
+    </div>
+
+    <div class="test-section">
+        <h2>📊 Events API Tests</h2>
+        <button onclick="testSingleEvent()">단일 이벤트 테스트</button>
+        <button onclick="testBatchEvents()">배치 이벤트 테스트</button>
+        <button onclick="testInvalidEvent()">잘못된 이벤트 테스트</button>
+        <button onclick="testAuthenticatedEvent()">인증된 이벤트 테스트</button>
+    </div>
+
+    <div class="test-section">
+        <h2>🛡️ Guard API Tests</h2>
+        <button onclick="testGuardNoAuth()">인증 없음 테스트</button>
+        <button onclick="testGuardWithAuth()">인증 포함 테스트</button>
+    </div>
+
+    <div class="test-section">
+        <h2>🔗 Integration Tests</h2>
+        <button onclick="testFullWorkflow()">전체 워크플로우 테스트</button>
+        <button onclick="testAnalyticsLib()">Analytics 라이브러리 테스트</button>
+    </div>
+
+    <div class="test-section">
+        <h2>📋 결과</h2>
+        <button onclick="clearResults()">결과 지우기</button>
+        <div id="results">테스트를 실행하면 결과가 여기에 표시됩니다.</div>
+    </div>
+
+    <script>
+        let testResults = [];
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const colorClass = type;
+            const formattedMessage = `[${timestamp}] ${message}`;
+            
+            testResults.push(formattedMessage);
+            document.getElementById('results').innerHTML = testResults.join('\n');
+            
+            console.log(formattedMessage);
+        }
+
+        function clearResults() {
+            testResults = [];
+            document.getElementById('results').innerHTML = 'Results cleared.';
+        }
+
+        async function makeRequest(endpoint, options = {}) {
+            const supabaseUrl = document.getElementById('supabaseUrl').value;
+            const url = `${supabaseUrl}/functions/v1/${endpoint}`;
+            
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    },
+                    ...options
+                });
+
+                const responseText = await response.text();
+                let data = {};
+                
+                try {
+                    data = JSON.parse(responseText);
+                } catch {
+                    data = { raw: responseText };
+                }
+
+                return {
+                    status: response.status,
+                    data,
+                    ok: response.ok
+                };
+            } catch (error) {
+                log(`Request failed: ${error.message}`, 'error');
+                return {
+                    status: 0,
+                    data: { error: error.message },
+                    ok: false
+                };
+            }
+        }
+
+        // ========================================
+        // EVENTS API TESTS
+        // ========================================
+
+        async function testSingleEvent() {
+            log('🧪 Testing single event...', 'info');
+            
+            const response = await makeRequest('events', {
+                body: JSON.stringify({
+                    name: 'test_single_event',
+                    params: {
+                        user_action: 'button_click',
+                        page: '/test',
+                        test_timestamp: new Date().toISOString()
+                    },
+                    ts: new Date().toISOString()
+                })
+            });
+
+            if (response.status === 200 && response.data.success) {
+                log(`✅ Single event test passed: processed ${response.data.processed} events`, 'success');
+            } else {
+                log(`❌ Single event test failed: ${response.status} - ${JSON.stringify(response.data)}`, 'error');
+            }
+        }
+
+        async function testBatchEvents() {
+            log('🧪 Testing batch events...', 'info');
+            
+            const events = [
+                { name: 'page_view', params: { page: '/home' } },
+                { name: 'click', params: { element: 'button' } },
+                { name: 'compile_prompt', params: { template_id: 'test_123', model: 'gpt-4' } }
+            ];
+
+            const response = await makeRequest('events', {
+                body: JSON.stringify(events)
+            });
+
+            if (response.status === 200 && response.data.success) {
+                log(`✅ Batch events test passed: processed ${response.data.processed} events`, 'success');
+            } else {
+                log(`❌ Batch events test failed: ${response.status} - ${JSON.stringify(response.data)}`, 'error');
+            }
+        }
+
+        async function testInvalidEvent() {
+            log('🧪 Testing invalid event...', 'info');
+            
+            const response = await makeRequest('events', {
+                body: JSON.stringify({
+                    invalid: 'data',
+                    no_name: true
+                })
+            });
+
+            if (response.status === 400 && response.data.code === 'NO_VALID_EVENTS') {
+                log('✅ Invalid event test passed: correctly rejected invalid data', 'success');
+            } else {
+                log(`❌ Invalid event test failed: expected 400/NO_VALID_EVENTS, got ${response.status} - ${JSON.stringify(response.data)}`, 'error');
+            }
+        }
+
+        async function testAuthenticatedEvent() {
+            log('🧪 Testing authenticated event...', 'info');
+            
+            const token = document.getElementById('jwtToken').value;
+            if (!token) {
+                log('⚠️ No JWT token provided, skipping authenticated test', 'info');
+                return;
+            }
+
+            const response = await makeRequest('events', {
+                headers: {
+                    'Authorization': token.startsWith('Bearer ') ? token : `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    name: 'authenticated_event',
+                    params: {
+                        action: 'premium_feature',
+                        authenticated: true
+                    }
+                })
+            });
+
+            if (response.status === 200 && response.data.success) {
+                log(`✅ Authenticated event test passed: processed ${response.data.processed} events`, 'success');
+            } else {
+                log(`❌ Authenticated event test failed: ${response.status} - ${JSON.stringify(response.data)}`, 'error');
+            }
+        }
+
+        // ========================================
+        // GUARD API TESTS  
+        // ========================================
+
+        async function testGuardNoAuth() {
+            log('🛡️ Testing guard without auth...', 'info');
+            
+            const response = await makeRequest('guard', {
+                body: JSON.stringify({})
+            });
+
+            if (response.status === 401 && response.data.code === 'INVALID_TOKEN') {
+                log('✅ Guard no-auth test passed: correctly rejected unauthorized request', 'success');
+            } else {
+                log(`❌ Guard no-auth test failed: expected 401/INVALID_TOKEN, got ${response.status} - ${JSON.stringify(response.data)}`, 'error');
+            }
+        }
+
+        async function testGuardWithAuth() {
+            log('🛡️ Testing guard with auth...', 'info');
+            
+            const token = document.getElementById('jwtToken').value;
+            if (!token) {
+                log('⚠️ No JWT token provided, skipping authenticated guard test', 'info');
+                return;
+            }
+
+            const response = await makeRequest('guard', {
+                headers: {
+                    'Authorization': token.startsWith('Bearer ') ? token : `Bearer ${token}`
+                },
+                body: JSON.stringify({})
+            });
+
+            if (response.status === 200) {
+                log(`✅ Guard auth test passed: ${JSON.stringify(response.data)}`, 'success');
+            } else if (response.status === 402) {
+                log(`⚠️ Guard auth test: quota exceeded (402) - ${JSON.stringify(response.data)}`, 'info');
+            } else if (response.status === 404) {
+                log(`⚠️ Guard auth test: user not found in database (404) - ${JSON.stringify(response.data)}`, 'info');
+            } else {
+                log(`❌ Guard auth test failed: ${response.status} - ${JSON.stringify(response.data)}`, 'error');
+            }
+        }
+
+        // ========================================
+        // INTEGRATION TESTS
+        // ========================================
+
+        async function testFullWorkflow() {
+            log('🔗 Testing full workflow (Guard → Events)...', 'info');
+            
+            const token = document.getElementById('jwtToken').value;
+            if (!token) {
+                log('⚠️ No JWT token provided, testing without authentication', 'info');
+            }
+
+            const headers = token ? {
+                'Authorization': token.startsWith('Bearer ') ? token : `Bearer ${token}`
+            } : {};
+
+            // Step 1: Check guard
+            log('Step 1: Checking guard...', 'info');
+            const guardResponse = await makeRequest('guard', {
+                headers,
+                body: JSON.stringify({})
+            });
+
+            log(`Guard response: ${guardResponse.status} - ${JSON.stringify(guardResponse.data)}`, 'info');
+
+            // Step 2: Send event based on guard result
+            log('Step 2: Sending event...', 'info');
+            const eventResponse = await makeRequest('events', {
+                headers,
+                body: JSON.stringify({
+                    name: 'workflow_test',
+                    params: {
+                        guard_status: guardResponse.status,
+                        guard_allowed: guardResponse.status === 200,
+                        workflow_step: 'integration_test'
+                    }
+                })
+            });
+
+            if (eventResponse.status === 200 && eventResponse.data.success) {
+                log(`✅ Full workflow test passed: Guard(${guardResponse.status}) → Event(${eventResponse.status})`, 'success');
+            } else {
+                log(`❌ Full workflow test failed: Event step failed with ${eventResponse.status}`, 'error');
+            }
+        }
+
+        async function testAnalyticsLib() {
+            log('📊 Testing analytics library integration...', 'info');
+            
+            // Simulate analytics library usage
+            const mockAnalyticsEvent = {
+                event_name: 'analytics_lib_test',
+                user_id: 'test_user',
+                session_id: `session_${Date.now()}`,
+                timestamp: new Date().toISOString(),
+                page_url: window.location.href,
+                page_title: document.title,
+                user_agent: navigator.userAgent,
+                custom_param: 'analytics_integration'
+            };
+
+            // Convert to expected format
+            const eventData = {
+                name: mockAnalyticsEvent.event_name,
+                params: {
+                    user_id: mockAnalyticsEvent.user_id,
+                    session_id: mockAnalyticsEvent.session_id,
+                    page_url: mockAnalyticsEvent.page_url,
+                    page_title: mockAnalyticsEvent.page_title,
+                    user_agent: mockAnalyticsEvent.user_agent,
+                    custom_param: mockAnalyticsEvent.custom_param
+                },
+                ts: mockAnalyticsEvent.timestamp
+            };
+
+            const response = await makeRequest('events', {
+                body: JSON.stringify(eventData)
+            });
+
+            if (response.status === 200 && response.data.success) {
+                log('✅ Analytics library integration test passed', 'success');
+            } else {
+                log(`❌ Analytics library integration test failed: ${response.status} - ${JSON.stringify(response.data)}`, 'error');
+            }
+        }
+
+        // Initialize
+        log('EasyPick Edge Functions Frontend Test initialized', 'info');
+        log('Configure your Supabase URL and JWT token above, then run tests', 'info');
+    </script>
+</body>
+</html>

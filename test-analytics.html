@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GA4 Analytics 테스트</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        button { padding: 10px 15px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .log { background: #f8f9fa; padding: 10px; border-radius: 3px; margin-top: 10px; white-space: pre-wrap; font-family: monospace; }
+        .success { color: #28a745; }
+        .error { color: #dc3545; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 GA4 Analytics 테스트</h1>
+        
+        <div class="test-section">
+            <h3>📊 분석 서비스 상태</h3>
+            <p>User ID: <span id="user-id">로딩중...</span></p>
+            <p>Session ID: <span id="session-id">로딩중...</span></p>
+            <div id="status-log" class="log"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🎨 프롬프트 템플릿 테스트</h3>
+            <button onclick="testTemplateSelect()">템플릿 선택 이벤트</button>
+            <button onclick="testPromptCompile()">프롬프트 컴파일 이벤트</button>
+            <div id="template-log" class="log"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔄 워크플로우 테스트</h3>
+            <button onclick="testWorkflowStart()">워크플로우 시작</button>
+            <button onclick="testWorkflowStep()">단계 완료</button>
+            <div id="workflow-log" class="log"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔍 기타 이벤트 테스트</h3>
+            <button onclick="testToolInteraction()">AI 도구 상호작용</button>
+            <button onclick="testSearch()">검색 이벤트</button>
+            <button onclick="testEngagement()">사용자 참여</button>
+            <div id="misc-log" class="log"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>📱 배치 이벤트 테스트</h3>
+            <button onclick="testBatchEvents()">배치 이벤트 전송</button>
+            <div id="batch-log" class="log"></div>
+        </div>
+    </div>
+
+    <script>
+        // Mock Analytics Service (실제 프로젝트에서는 import)
+        class MockAnalyticsService {
+            constructor() {
+                this.userId = 'test_user_' + Math.random().toString(36).substr(2, 9);
+                this.sessionId = 'test_session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                this.isInitialized = true;
+                
+                // Mock gtag
+                window.gtag = window.gtag || function() {
+                    console.log('GA4 gtag call:', arguments);
+                };
+            }
+
+            async trackEvent(eventName, parameters = {}) {
+                const eventData = {
+                    event_name: eventName,
+                    user_id: this.userId,
+                    session_id: this.sessionId,
+                    timestamp: new Date().toISOString(),
+                    page_url: window.location.href,
+                    page_title: document.title,
+                    user_agent: navigator.userAgent,
+                    ...parameters
+                };
+
+                try {
+                    // Mock gtag call
+                    if (window.gtag) {
+                        const gtagParams = {
+                            user_id: this.userId,
+                            session_id: this.sessionId,
+                            ...parameters
+                        };
+                        
+                        window.gtag('event', eventName, gtagParams);
+                        console.log('✅ GA4 Event via gtag:', eventName, gtagParams);
+                    }
+
+                    // Mock Edge Function call
+                    const response = await this.mockEdgeFunctionCall(eventData);
+                    console.log('✅ Edge Function Response:', response);
+
+                    return { success: true, data: eventData };
+
+                } catch (error) {
+                    console.error('❌ Analytics Error:', error);
+                    return { success: false, error: error.message };
+                }
+            }
+
+            async mockEdgeFunctionCall(eventData) {
+                // Simulate Edge Function call
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        resolve({
+                            success: true,
+                            processed: 1,
+                            failed: 0,
+                            event_name: eventData.event_name,
+                            user_id: eventData.user_id,
+                            session_id: eventData.session_id
+                        });
+                    }, 100 + Math.random() * 200);
+                });
+            }
+
+            // EasyPick specific methods
+            trackTemplateSelect(templateId, templateType, category) {
+                return this.trackEvent('select_template', {
+                    template_id: templateId,
+                    template_type: templateType,
+                    category: category,
+                    event_category: 'prompt_tools',
+                    event_label: `${templateType}_${category}`
+                });
+            }
+
+            trackPromptCompile(promptId, promptLength, modelType, isSuccess = true) {
+                return this.trackEvent('compile_prompt', {
+                    prompt_id: promptId,
+                    prompt_length: promptLength,
+                    model_type: modelType,
+                    success: isSuccess,
+                    event_category: 'prompt_tools',
+                    event_label: modelType,
+                    value: promptLength
+                });
+            }
+
+            trackWorkflowStart(workflowId, workflowType, stepCount) {
+                return this.trackEvent('start_workflow', {
+                    workflow_id: workflowId,
+                    workflow_type: workflowType,
+                    step_count: stepCount,
+                    event_category: 'workflows',
+                    event_label: workflowType,
+                    value: stepCount
+                });
+            }
+
+            trackWorkflowStep(workflowId, stepNumber, stepType, timeSpent) {
+                return this.trackEvent('complete_step', {
+                    workflow_id: workflowId,
+                    step_number: stepNumber,
+                    step_type: stepType,
+                    time_spent: timeSpent,
+                    event_category: 'workflows',
+                    event_label: `${stepType}_step_${stepNumber}`,
+                    value: timeSpent
+                });
+            }
+
+            trackToolInteraction(toolId, toolName, actionType, category) {
+                return this.trackEvent('tool_interaction', {
+                    tool_id: toolId,
+                    tool_name: toolName,
+                    action_type: actionType,
+                    category: category,
+                    event_category: 'ai_tools',
+                    event_label: `${actionType}_${toolName}`
+                });
+            }
+
+            trackSearch(query, resultCount, filters = {}) {
+                return this.trackEvent('search', {
+                    search_term: query,
+                    result_count: resultCount,
+                    filters: JSON.stringify(filters),
+                    event_category: 'search',
+                    event_label: query
+                });
+            }
+
+            trackEngagement(engagementType, duration, element) {
+                return this.trackEvent('engagement', {
+                    engagement_type: engagementType,
+                    engagement_time: duration,
+                    element: element,
+                    event_category: 'engagement',
+                    event_label: engagementType,
+                    value: duration
+                });
+            }
+        }
+
+        // Initialize analytics
+        const analytics = new MockAnalyticsService();
+
+        // Update UI
+        document.getElementById('user-id').textContent = analytics.userId;
+        document.getElementById('session-id').textContent = analytics.sessionId;
+        document.getElementById('status-log').textContent = '✅ Analytics Service 초기화 완료\n✅ Session ID 생성됨\n✅ 테스트 준비 완료';
+
+        // Test functions
+        async function testTemplateSelect() {
+            const log = document.getElementById('template-log');
+            log.textContent = '🔄 템플릿 선택 이벤트 전송 중...\n';
+            
+            const result = await analytics.trackTemplateSelect(
+                'marketing_template_001',
+                'marketing',
+                'social_media'
+            );
+            
+            log.textContent += result.success ? 
+                '✅ 템플릿 선택 이벤트 전송 성공\n' + JSON.stringify(result.data, null, 2) :
+                '❌ 실패: ' + result.error;
+        }
+
+        async function testPromptCompile() {
+            const log = document.getElementById('template-log');
+            log.textContent = '🔄 프롬프트 컴파일 이벤트 전송 중...\n';
+            
+            const result = await analytics.trackPromptCompile(
+                'prompt_001',
+                256,
+                'gpt-4',
+                true
+            );
+            
+            log.textContent += result.success ? 
+                '✅ 프롬프트 컴파일 이벤트 전송 성공\n' + JSON.stringify(result.data, null, 2) :
+                '❌ 실패: ' + result.error;
+        }
+
+        async function testWorkflowStart() {
+            const log = document.getElementById('workflow-log');
+            log.textContent = '🔄 워크플로우 시작 이벤트 전송 중...\n';
+            
+            const result = await analytics.trackWorkflowStart(
+                'content_creation_workflow',
+                'content_creation',
+                5
+            );
+            
+            log.textContent += result.success ? 
+                '✅ 워크플로우 시작 이벤트 전송 성공\n' + JSON.stringify(result.data, null, 2) :
+                '❌ 실패: ' + result.error;
+        }
+
+        async function testWorkflowStep() {
+            const log = document.getElementById('workflow-log');
+            log.textContent = '🔄 워크플로우 단계 완료 이벤트 전송 중...\n';
+            
+            const result = await analytics.trackWorkflowStep(
+                'content_creation_workflow',
+                3,
+                'content_generation',
+                45000
+            );
+            
+            log.textContent += result.success ? 
+                '✅ 워크플로우 단계 완료 이벤트 전송 성공\n' + JSON.stringify(result.data, null, 2) :
+                '❌ 실패: ' + result.error;
+        }
+
+        async function testToolInteraction() {
+            const log = document.getElementById('misc-log');
+            log.textContent = '🔄 AI 도구 상호작용 이벤트 전송 중...\n';
+            
+            const result = await analytics.trackToolInteraction(
+                'chatgpt_001',
+                'ChatGPT',
+                'click',
+                'text_generation'
+            );
+            
+            log.textContent += result.success ? 
+                '✅ AI 도구 상호작용 이벤트 전송 성공\n' + JSON.stringify(result.data, null, 2) :
+                '❌ 실패: ' + result.error;
+        }
+
+        async function testSearch() {
+            const log = document.getElementById('misc-log');
+            log.textContent = '🔄 검색 이벤트 전송 중...\n';
+            
+            const result = await analytics.trackSearch(
+                'AI 글쓰기 도구',
+                25,
+                { category: 'writing', price: 'free' }
+            );
+            
+            log.textContent += result.success ? 
+                '✅ 검색 이벤트 전송 성공\n' + JSON.stringify(result.data, null, 2) :
+                '❌ 실패: ' + result.error;
+        }
+
+        async function testEngagement() {
+            const log = document.getElementById('misc-log');
+            log.textContent = '🔄 사용자 참여 이벤트 전송 중...\n';
+            
+            const result = await analytics.trackEngagement(
+                'scroll_depth',
+                30000,
+                'main_content'
+            );
+            
+            log.textContent += result.success ? 
+                '✅ 사용자 참여 이벤트 전송 성공\n' + JSON.stringify(result.data, null, 2) :
+                '❌ 실패: ' + result.error;
+        }
+
+        async function testBatchEvents() {
+            const log = document.getElementById('batch-log');
+            log.textContent = '🔄 배치 이벤트 전송 중...\n';
+            
+            try {
+                // 여러 이벤트를 순차적으로 전송 (실제 배치는 Edge Function에서 처리)
+                const events = [
+                    () => analytics.trackTemplateSelect('batch_template_1', 'email', 'newsletter'),
+                    () => analytics.trackPromptCompile('batch_prompt_1', 180, 'gpt-3.5', true),
+                    () => analytics.trackToolInteraction('midjourney_001', 'Midjourney', 'generate', 'image_generation')
+                ];
+
+                const results = await Promise.all(events.map(fn => fn()));
+                
+                const successCount = results.filter(r => r.success).length;
+                const failCount = results.filter(r => !r.success).length;
+
+                log.textContent += `✅ 배치 이벤트 전송 완료\n성공: ${successCount}, 실패: ${failCount}\n\n`;
+                
+                results.forEach((result, index) => {
+                    log.textContent += `이벤트 ${index + 1}: ${result.success ? '✅' : '❌'}\n`;
+                });
+
+            } catch (error) {
+                log.textContent += '❌ 배치 이벤트 전송 실패: ' + error.message;
+            }
+        }
+
+        // Auto track page view
+        window.addEventListener('load', () => {
+            analytics.trackEvent('page_view', {
+                page_name: 'analytics_test',
+                page_title: 'GA4 Analytics 테스트',
+                event_category: 'navigation'
+            });
+        });
+    </script>
+</body>
+</html>

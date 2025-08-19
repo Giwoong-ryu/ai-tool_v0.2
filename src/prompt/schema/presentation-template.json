@@ -1,0 +1,252 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PPT 프레젠테이션 템플릿 스키마",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "const": "ppt_presentation"
+    },
+    "name": {
+      "type": "string",
+      "const": "PPT 프레젠테이션"
+    },
+    "category": {
+      "type": "string",
+      "const": "비즈니스"
+    },
+    "description": {
+      "type": "string",
+      "const": "프레젠테이션 제작을 위한 프롬프트"
+    },
+    "icon": {
+      "type": "string",
+      "default": "📊"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "default": "1.0.0"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "deprecated", "draft"],
+      "default": "active"
+    },
+    "template": {
+      "type": "string",
+      "minLength": 100,
+      "description": "Handlebars 템플릿 문자열"
+    },
+    "options": {
+      "type": "array",
+      "minItems": 5,
+      "items": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "enum": ["subject", "slideCount", "toneStyle", "tool", "contentStructure"]
+          },
+          "label": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["select"]
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "defaultValue": {
+            "type": "string"
+          }
+        },
+        "required": ["key", "label", "type", "required"],
+        "allOf": [
+          {
+            "if": {
+              "properties": { "key": { "const": "subject" } }
+            },
+            "then": {
+              "properties": {
+                "label": { "const": "발표 주제" },
+                "type": { "const": "select" },
+                "required": { "const": true },
+                "options": {
+                  "type": "array",
+                  "contains": {
+                    "type": "string",
+                    "enum": ["교육 워크숍", "비즈니스 제안", "기술 발표", "제품 소개", "연구 발표", "마케팅 전략", "데이터 분석"]
+                  },
+                  "minItems": 7
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": { "key": { "const": "slideCount" } }
+            },
+            "then": {
+              "properties": {
+                "label": { "const": "슬라이드 수" },
+                "type": { "const": "select" },
+                "required": { "const": true },
+                "options": {
+                  "type": "array",
+                  "contains": {
+                    "type": "string",
+                    "enum": ["5장 내외", "10장 내외", "15장 내외", "20장 내외", "30장 내외"]
+                  },
+                  "minItems": 5
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": { "key": { "const": "toneStyle" } }
+            },
+            "then": {
+              "properties": {
+                "label": { "const": "톤 & 스타일" },
+                "type": { "const": "select" },
+                "required": { "const": true },
+                "options": {
+                  "type": "array",
+                  "contains": {
+                    "type": "string",
+                    "enum": ["모던·심플", "미니멀·클린", "밝고 경쾌함", "견고·신뢰", "창의적·실험적", "격식·포멀"]
+                  },
+                  "minItems": 6
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": { "key": { "const": "tool" } }
+            },
+            "then": {
+              "properties": {
+                "label": { "const": "사용 툴" },
+                "type": { "const": "select" },
+                "required": { "const": true },
+                "options": {
+                  "type": "array",
+                  "contains": {
+                    "type": "string",
+                    "enum": ["PowerPoint", "Google Slides", "Keynote", "Canva", "Figma", "Prezi", "SlideShare"]
+                  },
+                  "minItems": 7
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": { "key": { "const": "contentStructure" } }
+            },
+            "then": {
+              "properties": {
+                "label": { "const": "컨텐츠 구조" },
+                "type": { "const": "select" },
+                "required": { "const": true },
+                "options": {
+                  "type": "array",
+                  "contains": {
+                    "type": "string",
+                    "enum": ["Agenda→Why→How→Demo→Q&A", "문제→해결→결과→행동", "현황→분석→전략→실행", "도입→전개→결론", "서론→본론→결론", "기승전결", "자유 형식"]
+                  },
+                  "minItems": 7
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "author": {
+          "type": "string",
+          "default": "EasyPick"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": ["비즈니스", "프레젠테이션", "PPT", "발표"]
+        },
+        "difficulty": {
+          "type": "string",
+          "enum": ["beginner", "intermediate", "advanced"],
+          "default": "intermediate"
+        },
+        "estimatedTime": {
+          "type": "string",
+          "default": "15-20분"
+        },
+        "usage": {
+          "type": "object",
+          "properties": {
+            "totalUsage": {
+              "type": "number",
+              "minimum": 0,
+              "default": 0
+            },
+            "monthlyUsage": {
+              "type": "number",
+              "minimum": 0,
+              "default": 0
+            }
+          }
+        }
+      }
+    },
+    "defaults": {
+      "type": "object",
+      "properties": {
+        "subject": {
+          "type": "string",
+          "default": "비즈니스 제안"
+        },
+        "slideCount": {
+          "type": "string",
+          "default": "10장 내외"
+        },
+        "toneStyle": {
+          "type": "string",
+          "default": "모던·심플"
+        },
+        "tool": {
+          "type": "string",
+          "default": "PowerPoint"
+        },
+        "contentStructure": {
+          "type": "string",
+          "default": "Agenda→Why→How→Demo→Q&A"
+        }
+      }
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": ["id", "name", "category", "description", "template", "options"],
+  "additionalProperties": false
+}

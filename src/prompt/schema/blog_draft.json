@@ -1,0 +1,361 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "블로그 초안 작성 템플릿 스키마",
+  "description": "체계적인 블로그 초안 작성을 위한 프롬프트 템플릿 스키마",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "const": "blog_draft",
+      "description": "템플릿 고유 식별자"
+    },
+    "name": {
+      "type": "string",
+      "const": "블로그 초안 작성",
+      "description": "템플릿 표시명"
+    },
+    "category": {
+      "type": "string",
+      "const": "콘텐츠 제작",
+      "description": "템플릿 카테고리"
+    },
+    "description": {
+      "type": "string",
+      "const": "매력적이고 구조화된 블로그 초안을 작성하기 위한 종합 프롬프트 템플릿",
+      "description": "템플릿 설명"
+    },
+    "icon": {
+      "type": "string",
+      "default": "✏️",
+      "description": "템플릿 아이콘"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "default": "1.0.0",
+      "description": "템플릿 버전 (Semantic Versioning)"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "deprecated", "draft"],
+      "default": "active",
+      "description": "템플릿 상태"
+    },
+    "template": {
+      "type": "string",
+      "minLength": 200,
+      "description": "Handlebars 템플릿 문자열 - 최소 200자 이상"
+    },
+    "options": {
+      "type": "array",
+      "minItems": 6,
+      "description": "사용자 입력 필드 정의",
+      "items": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "enum": ["topic", "target_audience", "tone", "structure", "keywords", "call_to_action"]
+          },
+          "label": {
+            "type": "string",
+            "description": "필드 라벨"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["text", "textarea", "select"],
+            "description": "입력 필드 타입"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "select 타입일 때 선택 옵션들"
+          },
+          "placeholder": {
+            "type": "string",
+            "description": "입력 필드 placeholder"
+          },
+          "required": {
+            "type": "boolean",
+            "description": "필수 입력 여부"
+          },
+          "defaultValue": {
+            "type": "string",
+            "description": "기본값"
+          },
+          "validation": {
+            "type": "object",
+            "properties": {
+              "minLength": {
+                "type": "number",
+                "minimum": 0
+              },
+              "maxLength": {
+                "type": "number",
+                "minimum": 1
+              }
+            },
+            "description": "유효성 검사 규칙"
+          }
+        },
+        "required": ["key", "label", "type", "required"],
+        "allOf": [
+          {
+            "if": {
+              "properties": { "key": { "const": "topic" } }
+            },
+            "then": {
+              "properties": {
+                "label": { "const": "주제" },
+                "type": { "const": "text" },
+                "required": { "const": true },
+                "placeholder": { "const": "블로그 글의 핵심 주제를 입력하세요 (예: AI 도구 활용법, 개발자 커리어)" },
+                "validation": {
+                  "type": "object",
+                  "properties": {
+                    "minLength": { "const": 5 },
+                    "maxLength": { "const": 100 }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": { "key": { "const": "target_audience" } }
+            },
+            "then": {
+              "properties": {
+                "label": { "const": "타겟 독자" },
+                "type": { "const": "select" },
+                "required": { "const": true },
+                "defaultValue": { "const": "일반인" },
+                "options": {
+                  "type": "array",
+                  "const": ["일반인", "초보자", "중급자", "전문가", "학생", "직장인", "창업가", "개발자"]
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": { "key": { "const": "tone" } }
+            },
+            "then": {
+              "properties": {
+                "label": { "const": "톤앤매너" },
+                "type": { "const": "select" },
+                "required": { "const": true },
+                "defaultValue": { "const": "친근하고 전문적인" },
+                "options": {
+                  "type": "array",
+                  "const": ["친근하고 전문적인", "유머러스한", "진지하고 학술적인", "격려하는", "도전적인", "실용적인"]
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": { "key": { "const": "structure" } }
+            },
+            "then": {
+              "properties": {
+                "label": { "const": "글 구조" },
+                "type": { "const": "select" },
+                "required": { "const": true },
+                "defaultValue": { "const": "도입-본론-결론" },
+                "options": {
+                  "type": "array",
+                  "const": ["도입-본론-결론", "문제-해결-결과", "시간순 나열", "비교-대조", "원인-결과", "단계별 가이드"]
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": { "key": { "const": "keywords" } }
+            },
+            "then": {
+              "properties": {
+                "label": { "const": "핵심 키워드" },
+                "type": { "const": "textarea" },
+                "required": { "const": false },
+                "placeholder": { "const": "포함하고 싶은 핵심 키워드를 쉼표로 구분해서 입력하세요 (SEO 최적화용)" },
+                "validation": {
+                  "type": "object",
+                  "properties": {
+                    "maxLength": { "const": 200 }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": { "key": { "const": "call_to_action" } }
+            },
+            "then": {
+              "properties": {
+                "label": { "const": "행동 유도" },
+                "type": { "const": "select" },
+                "required": { "const": false },
+                "defaultValue": { "const": "댓글 유도" },
+                "options": {
+                  "type": "array",
+                  "const": ["댓글 유도", "구독 요청", "공유 요청", "제품/서비스 소개", "이메일 수집", "없음"]
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "postProcessing": {
+      "type": "object",
+      "description": "후처리 설정",
+      "properties": {
+        "bulletToMarkdown": {
+          "type": "boolean",
+          "default": true,
+          "description": "불릿 포인트를 마크다운으로 변환"
+        },
+        "maxCharacters": {
+          "type": "number",
+          "default": 4000,
+          "minimum": 500,
+          "maximum": 10000,
+          "description": "최대 문자 수 제한"
+        },
+        "addMetadata": {
+          "type": "boolean",
+          "default": true,
+          "description": "메타데이터 추가 (작성일, 키워드 등)"
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "description": "템플릿 메타데이터",
+      "properties": {
+        "author": {
+          "type": "string",
+          "default": "EasyPick",
+          "description": "템플릿 작성자"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": ["블로그", "콘텐츠", "글쓰기", "초안", "SEO"],
+          "description": "템플릿 태그"
+        },
+        "difficulty": {
+          "type": "string",
+          "enum": ["beginner", "intermediate", "advanced"],
+          "default": "beginner",
+          "description": "사용 난이도"
+        },
+        "estimatedTime": {
+          "type": "string",
+          "default": "5-10분",
+          "description": "예상 사용 시간"
+        },
+        "usage": {
+          "type": "object",
+          "properties": {
+            "totalUsage": {
+              "type": "number",
+              "minimum": 0,
+              "default": 0,
+              "description": "총 사용 횟수"
+            },
+            "monthlyUsage": {
+              "type": "number",
+              "minimum": 0,
+              "default": 0,
+              "description": "월간 사용 횟수"
+            },
+            "successRate": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100,
+              "default": 0,
+              "description": "성공률 (%)"
+            }
+          },
+          "description": "사용 통계"
+        }
+      }
+    },
+    "defaults": {
+      "type": "object",
+      "description": "기본값 설정",
+      "properties": {
+        "target_audience": {
+          "type": "string",
+          "default": "일반인"
+        },
+        "tone": {
+          "type": "string",
+          "default": "친근하고 전문적인"
+        },
+        "structure": {
+          "type": "string",
+          "default": "도입-본론-결론"
+        },
+        "call_to_action": {
+          "type": "string",
+          "default": "댓글 유도"
+        }
+      }
+    },
+    "examples": {
+      "type": "array",
+      "description": "사용 예시",
+      "items": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "예시 제목"
+          },
+          "input": {
+            "type": "object",
+            "description": "입력 예시"
+          },
+          "output": {
+            "type": "string",
+            "description": "출력 예시"
+          }
+        }
+      },
+      "default": [
+        {
+          "title": "AI 도구 리뷰 글",
+          "input": {
+            "topic": "ChatGPT 활용 팁",
+            "target_audience": "직장인",
+            "tone": "실용적인",
+            "structure": "문제-해결-결과"
+          },
+          "output": "# ChatGPT로 업무 효율 3배 높이는 방법\n\n바쁜 직장 생활, 이제 AI의 도움을 받아보세요..."
+        }
+      ]
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "생성 일시"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "수정 일시"
+    }
+  },
+  "required": ["id", "name", "category", "description", "template", "options"],
+  "additionalProperties": false
+}
